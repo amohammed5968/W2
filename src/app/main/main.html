@@ -1,0 +1,155 @@
+<div layout="vertical" layout-fill>
+
+  <md-content>
+    <header>
+      <acme-navbar creation-date="main.creationDate"></acme-navbar>
+    </header>
+
+    <!--<section class="jumbotron">-->
+      <!--<h1>'Allo, 'Allo!</h1>-->
+      <!--<p class="lead">-->
+        <!--<img src="assets/images/yeoman.png" alt="I'm Yeoman"><br>-->
+        <!--Always a pleasure scaffolding your apps.-->
+      <!--</p>-->
+      <!--<md-button class="md-raised animated infinite" ng-class="main.classAnimation" ng-click="main.showToastr()">Splendid Toastr</md-button>-->
+      <!--&lt;!&ndash;<p>&ndash;&gt;-->
+        <!--&lt;!&ndash;With ♥ thanks to the contributions of<acme-malarkey extra-values="['Yeoman', 'Gulp', 'Angular']"></acme-malarkey>&ndash;&gt;-->
+      <!--&lt;!&ndash;</p>&ndash;&gt;-->
+    <!--</section>-->
+
+    <div class="techs" layout-align="center">
+      <md-card layout="column">
+        <md-card-content layout="column" layout-align="center">
+          {{main.matchInputDone}}
+        <form name="matchDetailsForm" ng-if="!main.matchInputDone">
+          <md-input-container  layout="row">
+            <label>Match Name</label>
+            <input ng-model="matchInput.matchName">
+          </md-input-container>
+          <md-input-container  layout="row">
+            <label>Team1</label>
+            <input ng-model="matchInput.teamOne">
+          </md-input-container>
+          <md-input-container  layout="row">
+            <label>Team2</label>
+            <input ng-model="matchInput.teamTwo">
+          </md-input-container>
+          <md-input-container  layout="row">
+            <label>No. of Overs</label>
+            <input ng-model="matchInput.overs">
+          </md-input-container>
+          <md-button class="md-raised md-primary" ng-click="main.saveMatchDetails(matchInput)">Done</md-button>
+
+          </md-button>
+
+        </form>
+
+
+          <md-list flex ng-if="main.matchInputDone">
+            <md-list-header>{{matchInput.matchName}}
+              <md-button class="md-raised md-fab" style="background-color: #3cff0b;color: white; ">
+                <i class="material-icons">mode_edit</i>
+              </md-button>
+               </md-list-header>
+              <div layout="column"> {{main.matchDetails.TeamOne.Name}}
+                <br>
+                <span> {{main.matchDetails.TeamOne.TotalScore}}</span>
+              </div>
+              <div layout="column"> {{main.matchDetails.TeamTwo.Name}}
+                <br>
+                <span> {{main.matchDetails.TeamTwo.TotalScore}}</span>
+              </div>
+          </md-list>
+          </md-card-content>
+      </md-card>
+      <md-card layout="column">
+           <md-card-header layout-align="center">
+             Match 1
+           </md-card-header>
+
+        <md-card-content layout="column" layout-align="center">
+          <md-input-container>
+            <label> Bowler</label>
+            <md-select ng-model="bowler">
+              <md-option ng-repeat="bowler in ['bowler1','bowler2', 'bowler3','bowler4','bowler5']" value="{{bowler}}">
+                {{bowler}}
+              </md-option>
+            </md-select>
+          </md-input-container>
+
+          <md-button class="md-fab md-primary md-hue-2" aria-label="Profile" ng-click="main.addBowler(bowler)">
+            <strong>+</strong>
+          </md-button>
+          <md-list flex>
+            <md-subheader class="md-no-sticky">Bowler</md-subheader>
+            <md-list-item class="md-3-line" ng-repeat="bowler in main.currentBowlers.Player" ng-click="null">
+              <div class="md-list-item-text" layout="column">
+                <h3>{{ bowler.PlayerName }}</h3>
+                <h4><span> O:{{ bowler.bowlingstats.Overs }} </span>
+                  <span>R:{{bowler.bowlingstats.Runs}}</span>
+                  <span>W:{{bowler.bowlingstats.Wickets}}</span>
+                  <span>6s:{{bowler.bowlingstats['6s']}}</span>
+                  <span>4s:{{bowler.bowlingstats['4s']}}</span>
+                  <span>3s:{{bowler.bowlingstats['3s']}}</span>
+                <p>{{bowler.bowlingstats.Runs}}/{{bowler.bowlingstats.Wickets}}</p>
+                  </h4>
+              </div>
+            </md-list-item>
+        </md-card-content>
+      </md-card>
+
+      <md-card layout="column">
+        <md-card-header layout-align="center">
+          Match Details
+        </md-card-header>
+        <md-card-content layout="row" layout-align="center">
+         <div layout="column"> {{main.matchDetails.TeamOne.Name}}
+          <br>
+          <span> {{main.matchDetails.TeamOne.TotalScore}}</span>
+         </div>
+          <div layout="column"> {{main.matchDetails.TeamTwo.Name}}
+            <br>
+            <span> {{main.matchDetails.TeamTwo.TotalScore}}</span>
+          </div>
+        </md-card-content>
+      </md-card>
+      <md-card>
+        <section layout="row" layout-sm="column" layout-align="center center" layout-wrap>
+          <md-button ng-repeat="run in main.runsScored" ng-click="main.saveRuns(run)"
+                     class="md-raised md-fab md-primary">{{run}}</md-button>
+          <md-button class="md-raised md-fab" style="background-color: red;color: white;  ">WK</md-button>
+            <md-button class="md-raised md-fab md-warn" ng-repeat="extra in main.extras"
+                       ng-click="main.setExtra(extra)">{{extra}}</md-button>
+          </section>
+        </section>
+
+      </md-card>
+      <md-card>
+        <div>Total Score: {{main.totalScore}}</div>
+        <div>Overs: {{main.totalOvers}}</div>
+        <div>{{main.balls}}</div>
+        <br>
+        <md-input-container class="md-block" flex-gt-sm>
+          <label>Bowler</label>
+          <md-select ng-model="currentBowler">
+            <md-option ng-repeat="bowler in main.bowlers" value="{{bowler.name}}" ng-click="main.selectedBowler(bowler)">
+              {{bowler.name}}
+            </md-option>
+          </md-select>
+        </md-input-container>
+        <div ></div>
+      </md-card>
+      <!--<md-card ng-repeat="awesomeThing in main.awesomeThings | orderBy:'rank'">-->
+        <!--<md-card-content>-->
+          <!--<img class="pull-right" ng-src="assets/images/{{ awesomeThing.logo }}" alt="{{ awesomeThing.title }}">-->
+          <!--<h3 class="md-title">{{ awesomeThing.title }}</h3>-->
+          <!--<p>{{ awesomeThing.description }}</p>-->
+        <!--</md-card-content>-->
+        <!--<div class="md-action-buttons">-->
+          <!--<md-button ng-href="{{ awesomeThing.url }}">Website</md-button>-->
+        <!--</div>-->
+      <!--</md-card>-->
+    </div>
+  </md-content>
+
+</div>
