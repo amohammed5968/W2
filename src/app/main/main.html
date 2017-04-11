@@ -77,7 +77,7 @@
             </md-select>
           </md-input-container>
 
-          <md-button class="md-fab md-primary md-hue-2" aria-label="Profile" ng-click="main.addBowler(bowler)">
+          <md-button class="md-fab md-primary md-hue-2" aria-label="Profile" ng-disabled="!main.addBowlerButton"  ng-click="main.addBowler(bowler)">
             <strong>+</strong>
           </md-button>
           <md-list flex>
@@ -115,7 +115,7 @@
       </md-card>
       <md-card>
         <section layout="row" layout-sm="column" layout-align="center center" layout-wrap>
-          <md-button ng-repeat="run in main.runsScored" ng-click="main.saveRuns(run)"
+          <md-button ng-repeat="run in main.runsScored" ng-disabled="main.addBowlerButton"  ng-click="main.saveRuns(run)"
                      class="md-raised md-fab md-primary">{{run}}</md-button>
           <md-button class="md-raised md-fab" style="background-color: red;color: white;  ">WK</md-button>
             <md-button class="md-raised md-fab md-warn" ng-repeat="extra in main.extras"
@@ -132,7 +132,8 @@
         <md-input-container class="md-block" flex-gt-sm>
           <label>Bowler</label>
           <md-select ng-model="currentBowler">
-            <md-option ng-repeat="bowler in main.bowlers" value="{{bowler.name}}" ng-click="main.selectedBowler(bowler)">
+            <md-option ng-repeat="bowler in main.bowlers" value="{{bowler.name}}"
+                       ng-click="main.selectedBowler(bowler)">
               {{bowler.name}}
             </md-option>
           </md-select>

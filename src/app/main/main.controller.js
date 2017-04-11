@@ -23,7 +23,7 @@
     main.saveRuns = saveRuns;
     main.selectedBowler = selectedBowler;
     main.currentBowlers.Player = [];
-    main.ballsArray = []
+    main.ballsArray = [];
 
 
     $log.info(locker.get('someKey'));
@@ -71,13 +71,14 @@
 
     main.bowlers = [{name: 'bowler1'}, {name: 'bowler2'}];
 
-    main.runsScored = ['1', '2', '3', '4', '5', '6'];
+    main.runsScored = [1, 2, 3, 4, 5, 6];
     main.extras = ['WD', 'NB', 'BYE'];
 
     main.totalScore = 0;
     main.totalOvers = 0.0;
     main.balls = 0;
     main.overCounter = 0;
+    main.addBowlerButton = true;
     var idx;
 
 
@@ -86,6 +87,7 @@
         return val.PlayerName;
       }).indexOf(checkValue);
     }
+
 
     main.addBowler = function (playerName) {
       var bowlingStats = {
@@ -112,6 +114,7 @@
       $log.info(JSON.stringify(main.currentBowlers));
       // localStorage['currentBowlers']= JSON.stringify(angular.copy(main.currentBowlers));
       //  locker.put('currentBowlers',angular.copy(main.currentBowlers));
+     main.addBowlerButton = false;
     };
 
     function addOvers(bowler) {
@@ -133,9 +136,36 @@
           if (checkOver()) {
             item.bowlingstats.Overs = Math.round((item.bowlingstats.Overs + 0.5) * 100) / 100;
             item.active = false;
+            main.addBowlerButton = true;
+            // main.showPrompt();
           }
           else{ item.bowlingstats.Overs = Math.round((item.bowlingstats.Overs + 0.1)* 100) / 100;}
           // item.bowlingstats.Overs = +item.bowlingstats.Overs.toFixed(1) + +(0.1).toFixed(1);
+          switch (runs)
+          {
+            case 4:
+                 item.bowlingstats['4s'] += 1;
+              $log.info(runs);
+                  break;
+            case 6:
+              $log.info(runs);
+              item.bowlingstats['6s'] += 1;
+                 break;
+            case 3:
+              $log.info(runs);
+              item.bowlingstats['3s'] += 1;
+                break;
+            case 2:
+              $log.info(runs);
+              item.bowlingstats['2s'] += 1;
+              break;
+            case 1:
+              $log.info(runs);
+              item.bowlingstats['1s'] += 1;
+                  break;
+
+          }
+
           item.bowlingstats.Runs = item.bowlingstats.Runs + +runs;
         }
       });
@@ -148,7 +178,7 @@
     function checkOver() {
       var cnt = 0;
       angular.forEach(main.ballsArray, function (item) {
-        cnt += !main.ballsArray.extras ? 1 : 0;
+        cnt += !item.extras ? 1 : 0;
       });
       return cnt % 6 == 0;
     } //end of checkOver
@@ -183,7 +213,7 @@
 
     function setExtra(extra) {
       main.enableExtraRuns = true;
-    };
+    }
     function selectedBowler(bowler) {
       $log.info(bowler);
 
