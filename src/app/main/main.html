@@ -1,4 +1,4 @@
-<div layout="vertical" layout-fill>
+<div layout="row" layout-fill flex>
 
   <md-content>
     <header>
@@ -24,21 +24,21 @@
         <form name="matchDetailsForm" ng-if="!main.matchInputDone">
           <md-input-container  layout="row">
             <label>Match Name</label>
-            <input ng-model="matchInput.matchName">
+            <input ng-model="main.matchInput.matchName">
           </md-input-container>
           <md-input-container  layout="row">
             <label>Team1</label>
-            <input ng-model="matchInput.teamOne">
+            <input ng-model="main.matchInput.teamOne">
           </md-input-container>
           <md-input-container  layout="row">
             <label>Team2</label>
-            <input ng-model="matchInput.teamTwo">
+            <input ng-model="main.matchInput.teamTwo">
           </md-input-container>
           <md-input-container  layout="row">
             <label>No. of Overs</label>
-            <input ng-model="matchInput.overs">
+            <input ng-model="main.matchInput.overs">
           </md-input-container>
-          <md-button class="md-raised md-primary" ng-click="main.saveMatchDetails(matchInput)">Done</md-button>
+          <md-button class="md-raised md-primary" ng-click="main.saveMatchDetails(main.matchInput)">Done</md-button>
 
           </md-button>
 
@@ -47,7 +47,7 @@
 
           <md-list flex ng-if="main.matchInputDone">
             <md-list-header>{{matchInput.matchName}}
-              <md-button class="md-raised md-fab" style="background-color: #3cff0b;color: white; ">
+              <md-button class="md-raised md-fab" style="background-color: #3cff0b;color: white;" ng-click="main.editMatchDetails(matchInput)">
                 <i class="material-icons">mode_edit</i>
               </md-button>
                </md-list-header>
@@ -71,7 +71,7 @@
           <md-input-container>
             <label> Bowler</label>
             <md-select ng-model="bowler">
-              <md-option ng-repeat="bowler in ['bowler1','bowler2', 'bowler3','bowler4','bowler5']" value="{{bowler}}">
+              <md-option ng-repeat="bowler in ['Player1','Player2', 'Player3','Player4','Player5']" value="{{bowler}}">
                 {{bowler}}
               </md-option>
             </md-select>
@@ -80,6 +80,21 @@
           <md-button class="md-fab md-primary md-hue-2" aria-label="Profile" ng-disabled="!main.addBowlerButton"  ng-click="main.addBowler(bowler)">
             <strong>+</strong>
           </md-button>
+
+
+          <md-input-container>
+            <label>Batsmen</label>
+            <md-select ng-model="batsmen">
+              <md-option ng-repeat="Batsmen in ['Player1','Player2', 'Player3','Player4','Player5']" value="{{Batsmen}}">
+                {{Batsmen}}
+              </md-option>
+            </md-select>
+          </md-input-container>
+
+          <md-button class="md-fab md-primary md-hue-2" aria-label="Profile" ng-disabled="!main.addBowlerButton"  ng-click="main.addBatsmen(batsmen)">
+            <strong>+</strong>
+          </md-button>
+
           <md-list flex>
             <md-subheader class="md-no-sticky">Bowler</md-subheader>
             <md-list-item class="md-3-line" ng-repeat="bowler in main.currentBowlers.Player" ng-click="null">
@@ -95,6 +110,7 @@
                   </h4>
               </div>
             </md-list-item>
+            </md-list>
         </md-card-content>
       </md-card>
 
@@ -102,8 +118,9 @@
         <md-card-header layout-align="center">
           Match Details
         </md-card-header>
-        <md-card-content layout="row" layout-align="center">
-         <div layout="column"> {{main.matchDetails.TeamOne.Name}}
+        <md-card-content layout="column" layout-align="center">
+         <div  layout="row">
+          <div layout="column"> {{main.matchDetails.TeamOne.Name}}
           <br>
           <span> {{main.matchDetails.TeamOne.TotalScore}}</span>
          </div>
@@ -111,6 +128,23 @@
             <br>
             <span> {{main.matchDetails.TeamTwo.TotalScore}}</span>
           </div>
+         </div>
+          <md-list flex layout="column">
+            <md-subheader class="md-no-sticky">Batsmen</md-subheader>
+            <md-list-item class="md-3-line" ng-repeat="batsmen in main.currentBatmens.Player" ng-click="null">
+              <div class="md-list-item-text" layout="column">
+                <h3>{{ batsmen.PlayerName }}</h3>
+                <h4><span> O:{{ batsmen.battingStats.Runs }} </span>
+                  <span>R:{{batsmen.battingStats.Balls}}</span>
+                  <span>W:{{batsmen.battingStats.SR}}</span>
+                  <span>6s:{{batsmen.battingStats['6s']}}</span>
+                  <span>4s:{{batsmen.battingStats['4s']}}</span>
+                  <span>3s:{{batsmen.battingStats['3s']}}</span>
+                </h4>
+              </div>
+            </md-list-item>
+          </md-list>
+
         </md-card-content>
       </md-card>
       <md-card>

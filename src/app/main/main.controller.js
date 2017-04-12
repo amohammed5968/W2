@@ -7,8 +7,8 @@
 
   /** @ngInject */
   function MainController($scope, $timeout, webDevTec, toastr, $log, locker, $mdDialog) {
-    var main = this,
-      matchInput = {
+    var main = this;
+      main.matchInput = {
         'teamOne': '',
         'teamTwo': '',
         'matchName': '',
@@ -24,6 +24,8 @@
     main.selectedBowler = selectedBowler;
     main.currentBowlers.Player = [];
     main.ballsArray = [];
+    main.currentBatmens = {};
+    main.currentBatmens.Player = [];
 
 
     $log.info(locker.get('someKey'));
@@ -49,6 +51,15 @@
 
     main.matchDetails.TeamOne.BattingFirst = true;
 
+    //edit matchDetails object
+    main.editMatchDetails = function editMatchDetails(matchInput)
+    {
+      main.matchInputDone = false;
+      main.matchInput.matchName = 'Test';
+      main.matchInput.teamOne =  main.matchDetails.TeamOne.Name;
+      main.matchInput.teamTwo =  main.matchDetails.TeamTwo.Name;
+      main.matchInput.overs = main.matchDetails.Overs;
+    };
 
     main.saveMatchDetails = function (details) {
       $log.info(details);
@@ -63,16 +74,10 @@
 
     $log.info(main.matchDetails);
 
-
-    // main.scoreCard.match = {'Team1':'Millikan Superstar', 'Team2':'Aloha Knights'};
-    // main.scoreCard.firstBatting = 'Millikan Superstar';
-    // main.scoreCard.team1 ={'FOW':'1/26-(player1,0.6overs)'};
-
-
     main.bowlers = [{name: 'bowler1'}, {name: 'bowler2'}];
 
     main.runsScored = [1, 2, 3, 4, 5, 6];
-    main.extras = ['WD', 'NB', 'BYE'];
+    main.extras = ['WD', 'NB', 'BYE', 'L-BYE'];
 
     main.totalScore = 0;
     main.totalOvers = 0.0;
@@ -218,6 +223,27 @@
       $log.info(bowler);
 
     }
+
+    //
+    main.addBatsmen = function(playerName)
+    {
+      var battingStats = {
+         'Runs': 0, 'Balls': 0, 'SR':0.00,'4s': 0,
+        '6s': 0, '3s': 0, '2s': 0, '1s': 0, '0s': 0
+      };
+    $log.info(playerName);
+    //  check if the batsmen is already add in the match object
+      $log.info(checkExists(main.currentBatmens.Player, playerName));
+
+      ((idx = checkExists(main.currentBatmens.Player, playerName)) == -1 ) ?
+        main.currentBatmens.Player.push({
+          'PlayerName': playerName,
+          'active': true,
+          'battingStats': battingStats
+        }) :null;
+      $log.info(main.currentBatmens);
+    };
+
 
     activate();
 
