@@ -6,13 +6,14 @@
     .controller('MainController', MainController);
 
   /** @ngInject */
-  function MainController($scope, $timeout, webDevTec, toastr, $log, locker, $mdDialog) {
+  function MainController($scope, $timeout, teamServices, toastr, $log, locker, $mdDialog) {
     var main = this;
       main.matchInput = {
         'teamOne': '',
         'teamTwo': '',
         'matchName': '',
-        'overs': 0
+        'overs': 0,
+        'firstBatting':''
       };
     main.matchInputDone = false;
     main.scoreCard = [];
@@ -24,10 +25,10 @@
     main.selectedBowler = selectedBowler;
     main.currentBowlers.Player = [];
     main.ballsArray = [];
-    main.currentBatmens = {};
-    main.currentBatmens.Player = [];
+    main.currentBatsmen = {};
+    main.currentBatsmen.Player = [];
 
-
+  
     $log.info(locker.get('someKey'));
     //Three variable to hold score card details
     //match details- object to hold summary details
@@ -51,22 +52,31 @@
 
     main.matchDetails.TeamOne.BattingFirst = true;
 
+    
+
     //edit matchDetails object
-    main.editMatchDetails = function editMatchDetails(matchInput)
+    main.editMatchDetails = function editMatchDetails()
     {
+       $log.info(main.matchDetails);
       main.matchInputDone = false;
-      main.matchInput.matchName = 'Test';
+      main.matchInput.matchName = main.matchDetails.matchName;
       main.matchInput.teamOne =  main.matchDetails.TeamOne.Name;
       main.matchInput.teamTwo =  main.matchDetails.TeamTwo.Name;
       main.matchInput.overs = main.matchDetails.Overs;
+      main.matchInput.firstBatting = main.matchDetails.TeamOne.BattingFirst?main.matchDetails.TeamOne.Name: main.matchDetails.TeamTwo.Name;
+      $log.info(main.matchDetails.TeamOne.BattingFirst?main.matchDetails.TeamOne.Name: main.matchDetails.TeamTwo.Name);
     };
 
     main.saveMatchDetails = function (details) {
       $log.info(details);
+      main.matchDetails.matchName = details.matchName;
       main.matchDetails.TeamOne.Name = details.teamOne;
       main.matchDetails.TeamTwo.Name = details.teamTwo;
       main.matchDetails.Overs = details.overs;
-      $log.info(main.matchDetails);
+      main.matchDetails.TeamTwo.BattingFirst = (main.matchDetails.TeamTwo.Name==details.firstBatting)?true:false;
+      main.matchDetails.TeamOne.BattingFirst = (main.matchDetails.TeamOne.Name==details.firstBatting)?true:false;
+      $log.info(main.matchDetails.TeamTwo.BattingFirst);
+      $log.info(main.matchDetails.TeamOne.BattingFirst);
       // localStorage.setItem('match', JSON.stringify(main.matchDetails));
       locker.put('match', main.matchDetails);
       main.matchInputDone = true;
@@ -74,16 +84,16 @@
 
     $log.info(main.matchDetails);
 
-    main.bowlers = [{name: 'bowler1'}, {name: 'bowler2'}];
-
+// initializing variables
     main.runsScored = [1, 2, 3, 4, 5, 6];
     main.extras = ['WD', 'NB', 'BYE', 'L-BYE'];
-
     main.totalScore = 0;
     main.totalOvers = 0.0;
     main.balls = 0;
     main.overCounter = 0;
     main.addBowlerButton = true;
+    main.addBatsmenButton = true;
+
     var idx;
 
 
@@ -130,11 +140,6 @@
     }
 
     function updateCurrentBowlerRuns(runs, extras) {
-      // $log.info(main.currentBowlers.Player.map(function (val) {
-      //   if (val.active)
-      //     return val;
-      // }));
-
       angular.forEach(main.currentBowlers.Player, function (item) {
         $log.info(item);
         if (item.active) {
@@ -169,16 +174,58 @@
               item.bowlingstats['1s'] += 1;
                   break;
 
-          }
+          }   //end of switch
 
           item.bowlingstats.Runs = item.bowlingstats.Runs + +runs;
         }
-      });
+      }); //end of forEach
 
       $log.info(main.currentBowlers.Player);
 
-    }
+    } //end of updateCurrentBowlerRuns
 
+function updateCurrentBatsmenStats(runs, extras)
+{
+  var overComplete = checkOver();
+  //  loop through the main.currentBatsmen object and update the batting stats for the player on strike
+  angular.forEach(main.currentBatsmen.Player, function(item){
+     $log.info('Inside currentBatsmen');  
+     $log.info(item);
+     //  add the runs to the batsmen on strike
+     if(item.active){
+         item.battingStats.Runs += runs;
+      //  if (checkOver())
+      //  {
+      //    changeStrike();
+      //   item.active = false;
+      //   main.addBatsmenButton = true;
+      //  } //ending inner if
+    } //ending if
+ }); //end of forEach of updateCurrentBatsmenStats
+          $log.info(runs % 2);
+          if(runs % 2 != 0) {
+                  //  if runs scored is odd by the active batsmen then change the strike 
+                !overComplete?changeStrike():null;
+                }
+                else //runs scored are even, no strike change is need unless over is complete
+                {
+                  overComplete?changeStrike():null;
+                } //end of runs if-else
+
+} //end of updateCurrentBatsmenStats
+
+function changeStrike()
+{
+  angular.forEach(main.currentBatsmen.Player,function(item)
+  {
+    $log.info(item);
+   if (!item.active){
+    item.active = true;
+    $log.info('Striker ' +item.PlayerName);
+   }
+   else {item.active = false; $log.info('Non-Striker ' +item.PlayerName);}
+  }) //end of forEach of changeStrike
+} //end of changeStrike
     //function to return true when the ballsArray has 6 deliveries without extras
     function checkOver() {
       var cnt = 0;
@@ -196,9 +243,14 @@
 
       //total balls
       main.balls = +main.balls + +1;
-      // check if the over is complete
-      $log.info(checkOver());
+    
+      // update the bowlerstats of the bowler
+      updateCurrentBowlerRuns(runs, extras);
 
+      // update the battingstats of the batsmen object
+      updateCurrentBatsmenStats(runs, extras);
+     
+    // check if the over is complete
       if (checkOver()) {
         // if (main.balls % 6 == 0) {
         $log.info('its over');
@@ -207,13 +259,11 @@
       }
       else {
         main.totalOvers = '0.' + main.balls;
-      }
+      } //end of if-else for checkover
+  main.totalOvers = +main.overCounter + +('0.' + main.balls);
 
-      // $log.info(+main.overCounter + +('0.' + main.balls));
-      main.totalOvers = +main.overCounter + +('0.' + main.balls);
-
-      // update the bowlerstats of the bowler
-      updateCurrentBowlerRuns(runs, extras);
+  // update the teams totalscore in match details
+   main.matchDetails.TeamOne.BattingFirst? main.matchDetails.TeamOne.TotalScore=main.totalScore:main.matchDetails.TeamTwo.TotalScore=main.totalScore;
     }
 
     function setExtra(extra) {
@@ -225,24 +275,27 @@
     }
 
     //
-    main.addBatsmen = function(playerName)
+    main.addBatsmen = function(playerName, striker)
     {
       var battingStats = {
          'Runs': 0, 'Balls': 0, 'SR':0.00,'4s': 0,
         '6s': 0, '3s': 0, '2s': 0, '1s': 0, '0s': 0
       };
-    $log.info(playerName);
+      
     //  check if the batsmen is already add in the match object
-      $log.info(checkExists(main.currentBatmens.Player, playerName));
+      $log.info(checkExists(main.currentBatsmen.Player, playerName));
 
-      ((idx = checkExists(main.currentBatmens.Player, playerName)) == -1 ) ?
-        main.currentBatmens.Player.push({
+      ((idx = checkExists(main.currentBatsmen.Player, playerName)) == -1 ) ?
+        main.currentBatsmen.Player.push({
           'PlayerName': playerName,
-          'active': true,
+          'active': main.striker?true:false,
           'battingStats': battingStats
         }) :null;
-      $log.info(main.currentBatmens);
-    };
+      $log.info(main.currentBatsmen);
+      
+     main.addBatsmenButton = (main.currentBatsmen.Player.length ==2)? false:true;
+     main.striker = false;
+    };  //end of addBatsmen
 
 
     activate();
@@ -260,11 +313,11 @@
     }
 
     function getTeam() {
-      main.awesomeThings = webDevTec.getTec();
-
-      angular.forEach(main.awesomeThings, function (awesomeThing) {
-        awesomeThing.rank = Math.random();
-      });
+      console.log(teamServices.getTeam());
+      main.matchDetails.TeamOne.Players = teamServices.getTeam();
+      // angular.forEach(main.awesomeThings, function (awesomeThing) {
+      //   awesomeThing.rank = Math.random();
+      // });
     }
   }
 })();
