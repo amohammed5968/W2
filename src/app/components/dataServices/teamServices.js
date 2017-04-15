@@ -49,10 +49,31 @@
       }
     ];
 
+    var data2 = [
+      {
+        'PlayerName': 'Shrini'
+      },
+      {
+        'PlayerName': 'Saravana Prakash'
+      },
+      {
+        'PlayerName': 'Sasi Kiran'
+      },
+      {
+        'PlayerName': 'Naren'
+      },
+      {
+        'PlayerName': 'Vijay'
+      }
+    ];
+
     this.getTeam = getTeam;
 
-    function getTeam() {
+    function getTeam(teamName) {
+      if (teamName=='Millikan')
       return data;
+      else
+      return data2;
     }
   }
 

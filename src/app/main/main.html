@@ -85,8 +85,9 @@
           <md-input-container  flex-gt-sm>
             <label> Bowler</label>
             <md-select ng-model="bowler">
-              <md-option ng-repeat="bowler in ['Player1','Player2', 'Player3','Player4','Player5']" value="{{bowler}}">
-                {{bowler}}
+              <md-option ng-repeat="bowler in (main.matchDetails.TeamOne.Bowling?main.matchDetails.TeamOne.Players:main.matchDetails.TeamTwo.Players)" 
+              value="{{bowler.PlayerName}}">
+                {{bowler.PlayerName}}
               </md-option>
             </md-select>
           </md-input-container>
@@ -101,7 +102,8 @@
           <md-input-container   flex-gt-sm>
             <label>Batsmen</label>
             <md-select ng-model="batsmen">
-              <md-option ng-repeat="Batsmen in main.matchDetails.TeamOne.Players" value="{{Batsmen.PlayerName}}">
+              <md-option ng-repeat="Batsmen in (main.matchDetails.TeamOne.Batting?main.matchDetails.TeamOne.Players:main.matchDetails.TeamTwo.Players)"
+               value="{{Batsmen.PlayerName}}">
                 {{Batsmen.PlayerName}}
               </md-option>
             </md-select>
@@ -133,12 +135,14 @@
         </md-card-header>
         <md-card-content layout="column" layout-align="center">
          <div  layout="row" layout-align="space-around start">
-          <div layout="column"> {{main.matchDetails.TeamOne.Name}}
+          <div ng-style="{'background-color':main.matchDetails.TeamOne.Batting?'rgb(255, 87, 34)':'rgba(0,0,0,0.12)'}" 
+          layout="column"> {{main.matchDetails.TeamOne.Name}}
           <br>
           <span> {{main.matchDetails.TeamOne.TotalScore}}</span>
          </div>
          <div>Vs</div>
-          <div layout="column"> {{main.matchDetails.TeamTwo.Name}}
+          <div ng-style="{'background-color':main.matchDetails.TeamTwo.Batting?'rgb(255, 87, 34)':'rgba(0,0,0,0.12)'}" 
+           layout="column"> {{main.matchDetails.TeamTwo.Name}}
             <br>
             <span> {{main.matchDetails.TeamTwo.TotalScore}}</span>
           </div>

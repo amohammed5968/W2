@@ -32,7 +32,7 @@
     $log.info(locker.get('someKey'));
     //Three variable to hold score card details
     //match details- object to hold summary details
-    var team = {'Name': '', 'BattingFirst': false, 'TotalScore': '0/0'};
+    var team = {'Name': '', 'BattingFirst': false, 'TotalScore': '0/0', 'Bowling':false, 'Batting':false};
 
     if (main.matchDetails = locker.get('match')) {
       // if (main.matchDetails = JSON.parse(localStorage.getItem('match'))) {
@@ -50,10 +50,6 @@
         'TeamOne': angular.copy(team), 'TeamTwo': angular.copy(team), 'Overs': 0
       };
 
-    main.matchDetails.TeamOne.BattingFirst = true;
-
-    
-
     //edit matchDetails object
     main.editMatchDetails = function editMatchDetails()
     {
@@ -63,7 +59,7 @@
       main.matchInput.teamOne =  main.matchDetails.TeamOne.Name;
       main.matchInput.teamTwo =  main.matchDetails.TeamTwo.Name;
       main.matchInput.overs = main.matchDetails.Overs;
-      main.matchInput.firstBatting = main.matchDetails.TeamOne.BattingFirst?main.matchDetails.TeamOne.Name: main.matchDetails.TeamTwo.Name;
+      // main.matchInput.firstBatting = main.matchDetails.TeamOne.BattingFirst?main.matchDetails.TeamOne.Name: main.matchDetails.TeamTwo.Name;           
       $log.info(main.matchDetails.TeamOne.BattingFirst?main.matchDetails.TeamOne.Name: main.matchDetails.TeamTwo.Name);
     };
 
@@ -75,6 +71,10 @@
       main.matchDetails.Overs = details.overs;
       main.matchDetails.TeamTwo.BattingFirst = (main.matchDetails.TeamTwo.Name==details.firstBatting)?true:false;
       main.matchDetails.TeamOne.BattingFirst = (main.matchDetails.TeamOne.Name==details.firstBatting)?true:false;
+      main.matchDetails.TeamOne.Batting = (main.matchDetails.TeamOne.Name==details.firstBatting)?true:false;
+      main.matchDetails.TeamTwo.Batting = (main.matchDetails.TeamTwo.Name==details.firstBatting)?true:false;
+      main.matchDetails.TeamOne.Bowling = (main.matchDetails.TeamOne.Name!=details.firstBatting)?true:false;
+      main.matchDetails.TeamTwo.Bowling = (main.matchDetails.TeamTwo.Name!=details.firstBatting)?true:false;
       $log.info(main.matchDetails.TeamTwo.BattingFirst);
       $log.info(main.matchDetails.TeamOne.BattingFirst);
       // localStorage.setItem('match', JSON.stringify(main.matchDetails));
@@ -313,11 +313,10 @@ function changeStrike()
     }
 
     function getTeam() {
-      console.log(teamServices.getTeam());
-      main.matchDetails.TeamOne.Players = teamServices.getTeam();
-      // angular.forEach(main.awesomeThings, function (awesomeThing) {
-      //   awesomeThing.rank = Math.random();
-      // });
+      if (main.matchDetails.TeamOne.Batting)
+      main.matchDetails.TeamOne.Players = teamServices.getTeam(main.matchDetails.TeamOne.Name);
+      else
+      main.matchDetails.TeamTwo.Players = teamServices.getTeam(main.matchDetails.TeamTwo.Name);
     }
   }
 })();
