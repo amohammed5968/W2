@@ -6,7 +6,8 @@
 
   angular
     .module('w2')
-    .service('teamServices', teamServices);
+    .service('teamServices', teamServices)
+    .factory('matchServices', matchServices);
 
   /** @ngInject */
   function teamServices() {
@@ -77,4 +78,34 @@
     }
   }
 
+  function matchServices(RestAPIURLFactory, $http)
+  {
+    var matchServices = {};
+
+    matchServices.getMatchesData = function () {
+      return $http.get(RestAPIURLFactory.matches);
+    };
+
+    matchServices.getMatchData = function (id) {
+      return $http.get(RestAPIURLFactory.matches + '/' + id);
+    };
+
+    matchServices.insertMatchData = function (match) {
+      return $http.post(urlBase, cust);
+    };
+
+    matchServices.updateCustomer = function (cust) {
+      return $http.put(urlBase + '/' + cust.ID, cust)
+    };
+
+    matchServices.deleteCustomer = function (id) {
+      return $http.delete(urlBase + '/' + id);
+    };
+
+    matchServices.getOrders = function (id) {
+      return $http.get(urlBase + '/' + id + '/orders');
+    };
+
+    return matchServices;
+  }
 })();

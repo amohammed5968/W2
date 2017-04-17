@@ -2,6 +2,18 @@
   'use strict';
 
   angular
-    .module('w2', ['ngAnimate', 'ngCookies', 'ngTouch', 'ngSanitize', 'ngMessages', 'ngAria', 'ui.router', 'ngMaterial', 'toastr','angular-locker']);
+    .module('w2', ['ngAnimate', 'ngCookies', 'ngTouch', 'ngSanitize', 'ngMessages', 'ngAria', 'ui.router', 'ngMaterial', 'toastr','angular-locker'])
+    .factory('RestAPIURLFactory', restAPIURL);
 
+  function restAPIURL()
+  {
+    // var dbserviceurl = 'http://ec2-54-84-167-254.compute-1.amazonaws.com:8080';
+    var dbserviceurl = 'http://localhost:8080';
+
+    return {
+      matches: dbserviceurl +'/matches',
+      users: dbserviceurl + '/users'
+    };
+
+  }
 })();

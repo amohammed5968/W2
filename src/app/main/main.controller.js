@@ -6,7 +6,7 @@
     .controller('MainController', MainController);
 
   /** @ngInject */
-  function MainController($scope, $timeout, teamServices, toastr, $log, locker, $mdDialog) {
+  function MainController($scope, $timeout, teamServices, toastr, $log, locker, $mdDialog, matchServices) {
     var main = this;
       main.matchInput = {
         'teamOne': '',
@@ -28,7 +28,9 @@
     main.currentBatsmen = {};
     main.currentBatsmen.Player = [];
 
-  
+     console.log(matchServices);
+
+
     $log.info(locker.get('someKey'));
     //Three variable to hold score card details
     //match details- object to hold summary details
@@ -59,7 +61,7 @@
       main.matchInput.teamOne =  main.matchDetails.TeamOne.Name;
       main.matchInput.teamTwo =  main.matchDetails.TeamTwo.Name;
       main.matchInput.overs = main.matchDetails.Overs;
-      // main.matchInput.firstBatting = main.matchDetails.TeamOne.BattingFirst?main.matchDetails.TeamOne.Name: main.matchDetails.TeamTwo.Name;           
+      // main.matchInput.firstBatting = main.matchDetails.TeamOne.BattingFirst?main.matchDetails.TeamOne.Name: main.matchDetails.TeamTwo.Name;
       $log.info(main.matchDetails.TeamOne.BattingFirst?main.matchDetails.TeamOne.Name: main.matchDetails.TeamTwo.Name);
     };
 
@@ -69,12 +71,12 @@
       main.matchDetails.TeamOne.Name = details.teamOne;
       main.matchDetails.TeamTwo.Name = details.teamTwo;
       main.matchDetails.Overs = details.overs;
-      main.matchDetails.TeamTwo.BattingFirst = (main.matchDetails.TeamTwo.Name==details.firstBatting)?true:false;
-      main.matchDetails.TeamOne.BattingFirst = (main.matchDetails.TeamOne.Name==details.firstBatting)?true:false;
-      main.matchDetails.TeamOne.Batting = (main.matchDetails.TeamOne.Name==details.firstBatting)?true:false;
-      main.matchDetails.TeamTwo.Batting = (main.matchDetails.TeamTwo.Name==details.firstBatting)?true:false;
-      main.matchDetails.TeamOne.Bowling = (main.matchDetails.TeamOne.Name!=details.firstBatting)?true:false;
-      main.matchDetails.TeamTwo.Bowling = (main.matchDetails.TeamTwo.Name!=details.firstBatting)?true:false;
+      main.matchDetails.TeamTwo.BattingFirst = (main.matchDetails.TeamTwo.Name==details.firstBatting);
+      main.matchDetails.TeamOne.BattingFirst = (main.matchDetails.TeamOne.Name==details.firstBatting);
+      main.matchDetails.TeamOne.Batting = (main.matchDetails.TeamOne.Name==details.firstBatting);
+      main.matchDetails.TeamTwo.Batting = (main.matchDetails.TeamTwo.Name==details.firstBatting);
+      main.matchDetails.TeamOne.Bowling = (main.matchDetails.TeamOne.Name!=details.firstBatting);
+      main.matchDetails.TeamTwo.Bowling = (main.matchDetails.TeamTwo.Name!=details.firstBatting);
       $log.info(main.matchDetails.TeamTwo.BattingFirst);
       $log.info(main.matchDetails.TeamOne.BattingFirst);
       // localStorage.setItem('match', JSON.stringify(main.matchDetails));
@@ -82,7 +84,7 @@
       main.matchInputDone = true;
     };
 
-    $log.info(main.matchDetails);
+    $log.info(JSON.stringify(main.matchDetails));
 
 // initializing variables
     main.runsScored = [1, 2, 3, 4, 5, 6];
@@ -189,7 +191,7 @@ function updateCurrentBatsmenStats(runs, extras)
   var overComplete = checkOver();
   //  loop through the main.currentBatsmen object and update the batting stats for the player on strike
   angular.forEach(main.currentBatsmen.Player, function(item){
-     $log.info('Inside currentBatsmen');  
+     $log.info('Inside currentBatsmen');
      $log.info(item);
      //  add the runs to the batsmen on strike
      if(item.active){
@@ -204,7 +206,7 @@ function updateCurrentBatsmenStats(runs, extras)
  }); //end of forEach of updateCurrentBatsmenStats
           $log.info(runs % 2);
           if(runs % 2 != 0) {
-                  //  if runs scored is odd by the active batsmen then change the strike 
+                  //  if runs scored is odd by the active batsmen then change the strike
                 !overComplete?changeStrike():null;
                 }
                 else //runs scored are even, no strike change is need unless over is complete
@@ -243,13 +245,13 @@ function changeStrike()
 
       //total balls
       main.balls = +main.balls + +1;
-    
+
       // update the bowlerstats of the bowler
       updateCurrentBowlerRuns(runs, extras);
 
       // update the battingstats of the batsmen object
       updateCurrentBatsmenStats(runs, extras);
-     
+
     // check if the over is complete
       if (checkOver()) {
         // if (main.balls % 6 == 0) {
@@ -281,19 +283,19 @@ function changeStrike()
          'Runs': 0, 'Balls': 0, 'SR':0.00,'4s': 0,
         '6s': 0, '3s': 0, '2s': 0, '1s': 0, '0s': 0
       };
-      
+
     //  check if the batsmen is already add in the match object
       $log.info(checkExists(main.currentBatsmen.Player, playerName));
 
       ((idx = checkExists(main.currentBatsmen.Player, playerName)) == -1 ) ?
         main.currentBatsmen.Player.push({
           'PlayerName': playerName,
-          'active': main.striker?true:false,
+          'active': !!main.striker,
           'battingStats': battingStats
         }) :null;
       $log.info(main.currentBatsmen);
-      
-     main.addBatsmenButton = (main.currentBatsmen.Player.length ==2)? false:true;
+
+     main.addBatsmenButton = (main.currentBatsmen.Player.length!=2);
      main.striker = false;
     };  //end of addBatsmen
 
