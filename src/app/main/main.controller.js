@@ -29,7 +29,7 @@
     main.currentBatsmen = {};
     main.currentBatsmen.Player = [];
 
-   
+
 
 
   //  function to disable extra buttons based on selection
@@ -37,24 +37,31 @@
     {
     //  return run==1?true:false;
     return false;
-    }
-    
+    };
+
     main.clearSelection = function ()
     {
       null;
-    }
-    
+    };
+
 
     main.getMatchDetails = function getMatchDetails(matchName) {
 
-      main.matchDetails = matchServices.getMatchesData();
+      main.matchDetails = matchServices.getMatchesData().then(
+        function(success){
+          console.log(success);
+        }
+        ,function(error){
+          console.log(error);
+        }
+      );
       console.log(main.matchDetails);
     };
 
     console.log(main.getMatchDetails());
 // $scope.str = main.matchDetails;
-   
-   
+
+
    main.undo = function ()
    {
      console.log(main.getMatchDetails);
@@ -107,6 +114,17 @@
       main.matchDetails.TeamOne.Bowling = (main.matchDetails.TeamOne.Name != details.firstBatting);
       main.matchDetails.TeamTwo.Bowling = (main.matchDetails.TeamTwo.Name != details.firstBatting);
 
+      matchServices.insertMatchData(JSON.stringify(main.matchDetails)).then(
+        function(success){
+         console.log(success);
+        }
+        ,function(error){
+          console.log(error);
+        }
+      );
+
+
+
       // localStorage.setItem('match', JSON.stringify(main.matchDetails));
       locker.put('match', main.matchDetails);
       main.matchInputDone = true;
@@ -131,7 +149,7 @@
                   //Initializtion of variables
                     main.canUndo = false;
                     main.canRedo = false;
-                
+
                 //Creation of chronicle object
                 main.numChronicle = Chronicle.record('matchDetails',main);
                 main.currentBatsmenChronicle = Chronicle.record('currentBatsmen',main);
@@ -164,7 +182,7 @@
         return val.PlayerName;
       }).indexOf(checkValue);
     }
-    
+
 
     main.addBowler = function (playerName) {
       var bowlingStats = {
@@ -200,7 +218,7 @@
       $log.info(bowler);
     }
 
-   
+
     function updateCurrentBowlerRuns(runs, extras) {
       angular.forEach(main.currentBowlers.Player, function (item) {
         $log.info(item);
@@ -255,7 +273,7 @@
         if (item.active) {
           item.battingStats.Runs += runs;
 
-          item.battingStats.RunsByBalls = item.battingStats.RunsByBalls + ' ' + runs ; 
+          item.battingStats.RunsByBalls = item.battingStats.RunsByBalls + ' ' + runs ;
           //  if (checkOver())
           //  {
           //    changeStrike();
@@ -335,8 +353,8 @@
 
       // update the teams totalscore in match details
       main.matchDetails.TeamOne.BattingFirst ? main.matchDetails.TeamOne.TotalScore = main.totalScore : main.matchDetails.TeamTwo.TotalScore = main.totalScore;
-      main.currentExtras = null;  
-     
+      main.currentExtras = null;
+
   }
 
    main.undoScore = function(){

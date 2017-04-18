@@ -91,7 +91,7 @@
     };
 
     matchServices.insertMatchData = function (match) {
-      return $http.post(RestAPIURLFactory, match);
+      return $http.post(RestAPIURLFactory.matches, match);
     };
 
     // matchServices.updateCustomer = function (cust) {
