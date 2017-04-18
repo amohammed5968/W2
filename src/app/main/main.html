@@ -73,7 +73,7 @@
           <md-input-container  flex-gt-sm>
             <label> Bowler</label>
             <md-select ng-model="bowler">
-              <md-option ng-repeat="bowler in (main.matchDetails.TeamOne.Bowling?main.matchDetails.TeamOne.Players:main.matchDetails.TeamTwo.Players)"
+              <md-option ng-repeat="bowler in (main.matchDetails.TeamOne.Bowling?main.matchDetails.TeamOne.Players:main.matchDetails.TeamTwo.Players)|filter:main.currentBowler"
               value="{{bowler.PlayerName}}">
                 {{bowler.PlayerName}}
               </md-option>
@@ -110,8 +110,6 @@
           ng-click="main.addBatsmen(batsmen,main.striker)">
             <strong>+</strong>
           </md-button>
-
-
        </form>
 
         </md-card-content>
@@ -150,6 +148,7 @@
                   <span>3s:{{batsmen.battingStats['3s']}}</span>
 
                 </h4>
+                <span>{{batsmen.battingStats.RunsByBalls}}</span>
               </div>
             </md-list-item>
           </md-list>
@@ -158,12 +157,16 @@
       </md-card>
       <md-card>
         <section layout="row" layout-sm="column" layout-align="center center" layout-wrap>
-          <md-button ng-repeat="run in main.runsScored" ng-disabled="main.addBowlerButton"  ng-click="main.saveRuns(run)"
+          <md-button ng-repeat="run in main.runsScored" ng-disabled="main.addBowlerButton || main.buttonDisable(run)"  ng-click="main.saveRuns(run)"
                      class="md-raised md-fab md-primary">{{run}}</md-button>
-          <md-button class="md-raised md-fab" style="background-color: red;color: white;">WK</md-button>
+          <md-button class="md-raised md-fab" style="background-color: red;color: white;" >WK</md-button>
             <md-button class="md-raised md-fab md-warn" ng-repeat="extra in main.extras"
                        ng-click="main.setExtra(extra)">{{extra}}</md-button>
-          </section>
+          <!--</section>-->
+          <md-button class="md-raised md-fab md-warn" ng-click="main.undoScore()">
+          <i class="material-icons">undo</i> </md-button>
+          <div> </div>
+
         </section>
 
       </md-card>
@@ -183,6 +186,8 @@
                   <span>6s:{{bowler.bowlingstats['6s']}}</span>
                   <span>4s:{{bowler.bowlingstats['4s']}}</span>
                   <span>3s:{{bowler.bowlingstats['3s']}}</span>
+                  <span>WD:{{bowler.bowlingstats['WD']}}</span>
+                  <span>NB:{{bowler.bowlingstats['NB']}}</span>
                 <p>{{bowler.bowlingstats.Runs}}/{{bowler.bowlingstats.Wickets}}</p>
                   </h4>
               </div>

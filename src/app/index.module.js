@@ -2,7 +2,7 @@
   'use strict';
 
   angular
-    .module('w2', ['ngAnimate', 'ngCookies', 'ngTouch', 'ngSanitize', 'ngMessages', 'ngAria', 'ui.router', 'ngMaterial', 'toastr','angular-locker'])
+    .module('w2', ['ngAnimate', 'ngCookies', 'ngTouch', 'ngSanitize', 'ngMessages', 'ngAria', 'ui.router', 'ngMaterial', 'toastr','angular-locker','Chronicle'])
     .factory('RestAPIURLFactory', restAPIURL);
 
   function restAPIURL()
@@ -12,7 +12,8 @@
 
     return {
       matches: dbserviceurl +'/matches',
-      users: dbserviceurl + '/users'
+      users: dbserviceurl + '/users',
+      schedule: dbserviceurl + '/schedule'
     };
 
   }

@@ -91,20 +91,20 @@
     };
 
     matchServices.insertMatchData = function (match) {
-      return $http.post(urlBase, cust);
+      return $http.post(RestAPIURLFactory, match);
     };
 
-    matchServices.updateCustomer = function (cust) {
-      return $http.put(urlBase + '/' + cust.ID, cust)
-    };
+    // matchServices.updateCustomer = function (cust) {
+    //   return $http.put(urlBase + '/' + cust.ID, cust)
+    // };
 
-    matchServices.deleteCustomer = function (id) {
-      return $http.delete(urlBase + '/' + id);
-    };
+    // matchServices.deleteCustomer = function (id) {
+    //   return $http.delete(urlBase + '/' + id);
+    // };
 
-    matchServices.getOrders = function (id) {
-      return $http.get(urlBase + '/' + id + '/orders');
-    };
+    // matchServices.getOrders = function (id) {
+    //   return $http.get(urlBase + '/' + id + '/orders');
+    // };
 
     return matchServices;
   }
