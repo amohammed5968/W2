@@ -7,7 +7,8 @@
     .filter('currentBowler', currentBowler);
 
   /** @ngInject */
-  function MainController($scope, $timeout, teamServices, toastr, $log, locker, $mdDialog, matchServices, ScheduleService, Chronicle) {
+  function MainController($scope, $timeout, teamServices, toastr, $log, locker, $mdDialog,
+                          matchServices, ScheduleService, Chronicle,DataService) {
     var main = this;
     main.matchInput = {
       'teamOne': '',
@@ -29,8 +30,7 @@
     main.currentBatsmen = {};
     main.currentBatsmen.Player = [];
 
-
-
+    var team = { 'Name': '', 'BattingFirst': false, 'TotalScore': '0/0', 'Bowling': false, 'Batting': false };
 
   //  function to disable extra buttons based on selection
     main.buttonDisable = function (run)
@@ -44,18 +44,32 @@
       null;
     };
 
+    //get MatchDetails
+    main.getMatchDetails = function(matchName) {
 
-    main.getMatchDetails = function getMatchDetails(matchName) {
+      DataService.getMatchDetails("MillikanVsAloha");
 
-      main.matchDetails = matchServices.getMatchesData().then(
+      main.matchDetails = matchServices.getMatchData("MillikanVsAloha").then(
         function(success){
-          console.log(success);
+
+          main.matchDetails = success.data;
+          if (main.matchDetails) {
+            main.matchInputDone = true;
+            main.matchDetails.TeamOne = main.matchDetails.TeamOne[0];
+            main.matchDetails.TeamTwo = main.matchDetails.TeamTwo[0];
+            console.log(main.matchDetails);
+            console.log(main.matchDetails.TeamOne.Batting);
+            console.log(main.matchDetails.TeamTwo.Batting);
+          }
+          else main.matchDetails = {
+            'TeamOne': angular.copy(team), 'TeamTwo': angular.copy(team), 'Overs': 0
+          };
         }
         ,function(error){
           console.log(error);
         }
       );
-      console.log(main.matchDetails);
+
     };
 
     console.log(main.getMatchDetails());
@@ -67,27 +81,25 @@
      console.log(main.getMatchDetails);
      main.chronicle.undo();
      console.log(main.getMatchDetails);
-   }
-    console.log(main.chronicle)
+   };
+    console.log(main.chronicle);
     //Three variable to hold score card details
     //match details- object to hold summary details
-    var team = { 'Name': '', 'BattingFirst': false, 'TotalScore': '0/0', 'Bowling': false, 'Batting': false };
 
-    if (main.matchDetails = locker.get('match')) {
+
+    // if (main.matchDetails = locker.get('match')) {
       // if (main.matchDetails = JSON.parse(localStorage.getItem('match'))) {
-      console.log(main.matchDetails);
-      main.matchInputDone = true;
+      // console.log(main.matchDetails);
+      // main.matchInputDone = true;
       //  if (locker.get('currentBowlers'))
       //  {
       // // if (JSON.parse(localStorage.getItem('currentBowlers'))) {
       //   main.currentBowlers = locker.get('currentBowlers');
       //   // main.currentBowlers.Player = [];
       // }
-    }
-    else
-      main.matchDetails = {
-        'TeamOne': angular.copy(team), 'TeamTwo': angular.copy(team), 'Overs': 0
-      };
+    // }
+    // else
+
 
     //edit matchDetails object
     main.editMatchDetails = function editMatchDetails() {
@@ -412,6 +424,7 @@
     }
 
     function getTeam() {
+      if (typeof main.matchDetails.TeamOne !== 'undefined')
       if (main.matchDetails.TeamOne.Batting)
         main.matchDetails.TeamOne.Players = teamServices.getTeam(main.matchDetails.TeamOne.Name);
       else

@@ -2,7 +2,7 @@
   'use strict';
 
   angular
-    .module('w2', ['ngAnimate', 'ngCookies', 'ngTouch', 'ngSanitize', 'ngMessages', 'ngAria', 'ui.router', 'ngMaterial', 'toastr','angular-locker','Chronicle'])
+    .module('w2', ['w2.schedule','ngAnimate', 'ngCookies', 'ngTouch', 'ngSanitize', 'ngMessages', 'ngAria', 'ui.router', 'ngMaterial', 'toastr','angular-locker', 'Chronicle'])
     .factory('RestAPIURLFactory', restAPIURL);
 
   function restAPIURL()

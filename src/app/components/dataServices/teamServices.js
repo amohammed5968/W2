@@ -7,7 +7,8 @@
   angular
     .module('w2')
     .service('teamServices', teamServices)
-    .factory('matchServices', matchServices);
+    .factory('matchServices', matchServices)
+    .factory('DataService', DataService);
 
   /** @ngInject */
   function teamServices() {
@@ -108,4 +109,40 @@
 
     return matchServices;
   }
+
+function DataService(RestAPIURLFactory, $http)
+{
+  /** hashMap - each key refers to list */
+  var hashMap = {};
+
+  /**
+   * Fetches JSON, traverses it to build hash map
+   * of lists for each UI component from json data
+   * object from serve.  Assigns hashMap where
+   * each key refers to a list.
+   */
+  (function traverseJSON(match) {
+    var json = $http.post(RestAPIURLFactory.matches, match);
+    /**
+     * implementation specific
+     */
+    hashMap = json;
+  }());
+
+  return {
+    /**
+     * @returns a list per UI type from hashMap
+     */
+    getMatchDetails: function(match) {
+      console.log(hashMap);
+      return hashMap.categories;
+    },
+    getTeamList: function() {
+      console.log(hashMap);
+      return hashMap.products;
+    }
+  }
+}
 })();
+
+
