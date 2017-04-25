@@ -314,7 +314,7 @@
           $log.info('Striker ' + item.PlayerName);
         }
         else { item.active = false; $log.info('Non-Striker ' + item.PlayerName); }
-      }) //end of forEach of changeStrike
+      }); //end of forEach of changeStrike
     } //end of changeStrike
     //function to return true when the ballsArray has 6 deliveries without extras
     function checkOver() {

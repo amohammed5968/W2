@@ -13,6 +13,10 @@ function ScheduleService(RestAPIURLFactory, $http)
       return $http.get(RestAPIURLFactory.schedule);
     };
 
+  scheduleService.insertSchedule = function (schedule) {
+      return $http.post(RestAPIURLFactory.schedule, schedule);
+  };
+
     return scheduleService;
 }
 })();
