@@ -1,11 +1,11 @@
-<div layout="row" layout-fill flex>
+<div layout="row"  layout-fill flex>
 
   <md-content>
     <header>
       <acme-navbar creation-date="main.creationDate"></acme-navbar>
     </header>
 
-    <div class="techs" layout-align="center" flex>
+    <div layout-align="center" layout-sm="column" layout-wrap flex>
       <md-card layout="column">
         <md-card-content layout="column" layout-align="center">
           {{main.matchInputDone}}
@@ -97,7 +97,7 @@
             </md-select>
           </md-input-container>
            <md-input-container>
-        <md-checkbox name="strike" ng-model="main.striker" ng-disabled="main.striker">
+        <md-checkbox name="strike" ng-model="main.striker">
           Strike
         </md-checkbox>
         <!--<div ng-messages="projectForm.tos.$error" multiple md-auto-hide="false">

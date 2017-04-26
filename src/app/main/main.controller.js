@@ -29,6 +29,7 @@
     main.ballsArray = [];
     main.currentBatsmen = {};
     main.currentBatsmen.Player = [];
+    main.strikerSet='';
 
     var team = { 'Name': '', 'BattingFirst': false, 'TotalScore': '0/0', 'Bowling': false, 'Batting': false };
 
@@ -43,6 +44,9 @@
     {
       null;
     };
+
+  //  switching batsmen
+   matchServices.switchBatsmen(main.currentBatsmen);
 
     //get MatchDetails
     main.getMatchDetails = function(matchName) {

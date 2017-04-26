@@ -24,7 +24,11 @@
     {
       ScheduleService.getSchedule().then(function(success){
         console.log(success);
-        sch.schedulelist = success.data;
+        sch.schedulelist = success.data.filter(function (el)
+        {
+          if (el.date.substr(0,4) == '2017')
+          return el;
+        }) ;
       }, function(error)
       {
         console.log(error);
@@ -43,7 +47,7 @@
         $scope.scheduleForm.$setUntouched();
         $scope.scheduleForm.$setPristine();
         sch.form = {};
-
+        sch.getSchedule ();
         console.log(success);
         var pinTo = sch.getToastPosition();
 

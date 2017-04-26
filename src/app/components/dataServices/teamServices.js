@@ -95,6 +95,11 @@
       return $http.post(RestAPIURLFactory.matches, match);
     };
 
+    matchServices.switchBatsmen = function(currentBatsmenArray)
+    {
+      console.log(currentBatsmenArray);
+    };
+
     // matchServices.updateCustomer = function (cust) {
     //   return $http.put(urlBase + '/' + cust.ID, cust)
     // };

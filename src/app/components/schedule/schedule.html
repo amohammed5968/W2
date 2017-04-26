@@ -11,29 +11,29 @@
     <form name="scheduleForm">
       <md-input-container  layout="row">
         <label>Match Sequence</label>
-        <input ng-model="sch.form.matchseq">
+        <input ng-model="sch.form.matchseq" required>
       </md-input-container>
       <md-input-container  layout="row">
         <label>Home Team</label>
-        <input ng-model="sch.form.hometeam">
+        <input ng-model="sch.form.hometeam"  required>
       </md-input-container>
       <md-input-container  layout="row">
         <label>Away Team</label>
-        <input ng-model="sch.form.awayteam">
+        <input ng-model="sch.form.awayteam"  required>
       </md-input-container>
       <md-input-container  layout="row">
         <label>Venue</label>
-        <input ng-model="sch.form.venue">
+        <input ng-model="sch.form.venue"  required>
       </md-input-container>
       <md-input-container  layout="row">
         <label>Overs</label>
-        <input ng-model="sch.form.overs">
+        <input ng-model="sch.form.overs"  required>
       </md-input-container>
 
-        <md-datepicker ng-model="sch.form.displaydate"></md-datepicker>
+        <md-datepicker ng-model="sch.form.displaydate"  required></md-datepicker>
 
       <div layout="row">
-        <md-button class="md-raised md-primary" ng-click="sch.saveSchedule(sch.form)">Done</md-button>
+        <md-button class="md-raised md-primary" ng-disabled="scheduleForm.$invalid" ng-click="sch.saveSchedule(sch.form)">Done</md-button>
 
       </md-button>
       </div>
@@ -45,9 +45,9 @@
       <md-card-content style="height: 400px; overflow-y: auto">
       <md-list flex>
         <md-subheader class="md-no-sticky">List view</md-subheader>
-        <md-list-item class="md-3-line" ng-repeat="item in sch.schedulelist| orderBy : -item.date" ng-click="null">
+        <md-list-item class="md-3-line" ng-repeat="item in sch.schedulelist| orderBy : '-item.matchseq'" ng-click="null">
           <div class="md-list-item-text" layout="column">
-            <h3>{{ item.title }}</h3>
+            <h3>Match {{item.matchseq}} : {{ item.title }}</h3>
             <h4>{{item.date}} at {{item.venue}}</h4>
             <p>{{}}</p>
 
