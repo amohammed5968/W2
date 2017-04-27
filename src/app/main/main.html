@@ -1,181 +1,225 @@
-<div layout="row"  layout-fill flex>
+<div layout="column" layout-fill flex>
 
   <md-content>
     <header>
       <acme-navbar creation-date="main.creationDate"></acme-navbar>
     </header>
 
-    <div layout-align="center" layout-sm="column" layout-wrap flex>
-      <md-card layout="column">
+    <div layout="row" layout-xs="column" flex>
+      <md-card flex="50">
         <md-card-content layout="column" layout-align="center">
-          {{main.matchInputDone}}
-        <form name="matchDetailsForm" ng-if="!main.matchInputDone">
-          <md-input-container  layout="row">
-            <label>Match Name</label>
-            <input ng-model="main.matchInput.matchName">
-          </md-input-container>
-          <md-input-container  layout="row">
-            <label>Team1</label>
-            <input ng-model="main.matchInput.teamOne">
-          </md-input-container>
-          <md-input-container  layout="row">
-            <label>Team2</label>
-            <input ng-model="main.matchInput.teamTwo">
-          </md-input-container>
-          <md-input-container  layout="row">
-            <label>No. of Overs</label>
-            <input ng-model="main.matchInput.overs">
-          </md-input-container>
-          <md-input-container layout="row">
-            <label>First Batting</label>
-            <md-select ng-model="main.matchInput.firstBatting">
-              <md-option ng-repeat="batting in [main.matchInput.teamOne, main.matchInput.teamTwo]" value="{{batting}}">
-                {{batting}}
-              </md-option>
-            </md-select>
-          </md-input-container>
-          <md-button class="md-raised md-primary" ng-click="main.saveMatchDetails(main.matchInput)">Done</md-button>
+          <form name="matchDetailsForm" ng-if="!main.matchInputDone">
+            <md-input-container layout="row">
+              <label>Match Name</label>
+              <input ng-model="main.matchInput.matchName">
+            </md-input-container>
+            <md-input-container layout="row">
+              <label>Team1</label>
+              <input ng-model="main.matchInput.teamOne">
+            </md-input-container>
+            <md-input-container layout="row">
+              <label>Team2</label>
+              <input ng-model="main.matchInput.teamTwo">
+            </md-input-container>
+            <md-input-container layout="row">
+              <label>No. of Overs</label>
+              <input ng-model="main.matchInput.overs">
+            </md-input-container>
+            <md-input-container layout="row">
+              <label>First Batting</label>
+              <md-select ng-model="main.matchInput.firstBatting">
+                <md-option ng-repeat="batting in [main.matchInput.teamOne, main.matchInput.teamTwo]"
+                           value="{{batting}}">
+                  {{batting}}
+                </md-option>
+              </md-select>
+            </md-input-container>
+            <md-button class="md-raised md-primary" ng-click="main.saveMatchDetails(main.matchInput)">Done</md-button>
 
-          </md-button>
+            </md-button>
 
-        </form>
+          </form>
 
 
           <md-list flex ng-if="main.matchInputDone">
-            <md-list-header>
-            <div  layout="row" layout-align="space-between start">
-              <h3>{{main.matchDetails.matchName}} </h3>
-              <!--<md-button class="md-raised md-fab md-primary" style="background-color:rgb(40, 53, 147);color: white;" -->
-              <!--ng-click="main.editMatchDetails(matchInput)">-->
-                <span><md-button class="md-raised md-fab md-primary" style="background-color:rgb(40, 53, 147);color: white;"
-                ng-click="main.editMatchDetails()"><i class="material-icons">mode_edit</i></span>
-              </md-button>
-            </div>
-               </md-list-header>
-              <div layout="column"> {{main.matchDetails.TeamOne.Name}}
-                <br>
-                <span> {{main.matchDetails.TeamOne.TotalScore}}</span>
-              </div>
-              <div layout="column"> {{main.matchDetails.TeamTwo.Name}}
-                <br>
-                <span> {{main.matchDetails.TeamTwo.TotalScore}}</span>
-              </div>
+            <md-card-content layout="column">
+              <md-toolbar layout-align="center">
+                <div layout="row" layout-align="space-between start">
+                  <h3>{{main.matchDetails.matchName}} </h3>
+                <span><md-button class="md-raised md-fab md-primary"  layout-align="center center"
+                                 style="background-color:rgb(250, 255, 255);color: #ff0021;"
+                                 ng-click="main.editMatchDetails()"><i class="material-icons">mode_edit</i></span>
+                  </md-button>
+                </div>
+              </md-toolbar>
+              <form name="bowlerDetailsForm" layout="row" layout-align="space-around start">
+                <md-input-container flex-gt-sm>
+                  <label> Bowler</label>
+                  <md-select ng-model="bowler">
+                    <md-option
+                      ng-repeat="bowler in (main.matchDetails.TeamOne.Bowling?main.matchDetails.TeamOne.Players:main.matchDetails.TeamTwo.Players)|filter:main.currentBowler"
+                      value="{{bowler.PlayerName}}">
+                      {{bowler.PlayerName}}
+                    </md-option>
+                  </md-select>
+                </md-input-container>
+
+                <md-button class="md-fab md-primary md-hue-2" aria-label="Profile" ng-disabled="!main.addBowlerButton"
+                           ng-click="main.addBowler(bowler)">
+                  <strong>+</strong>
+                </md-button>
+              </form>
+
+              <form name="batsmenForm" layout="row" class="md-block" layout-align="space-around start">
+                <md-input-container flex-gt-sm>
+                  <label>Batsmen</label>
+                  <md-select ng-model="batsmen">
+                    <md-option
+                      ng-repeat="Batsmen in (main.matchDetails.TeamOne.Batting?main.matchDetails.TeamOne.Players:main.matchDetails.TeamTwo.Players)"
+                      value="{{Batsmen.PlayerName}}">
+                      {{Batsmen.PlayerName}}
+                    </md-option>
+                  </md-select>
+                </md-input-container>
+                <md-input-container>
+                  <md-checkbox name="strike" ng-model="main.striker">
+                    Strike
+                  </md-checkbox>
+                </md-input-container>
+                <md-button class="md-fab md-primary md-hue-2" aria-label="Profile" ng-disabled="!main.addBatsmenButton"
+                           ng-click="main.addBatsmen(batsmen,main.striker)">
+                  <strong>+</strong>
+                </md-button>
+              </form>
+
+            </md-card-content>
           </md-list>
-          </md-card-content>
-      </md-card>
-      <md-card layout="column">
-           <md-card-header layout-align="center">
-             Match 1
-           </md-card-header>
-
-        <md-card-content layout="column">
-           <form name="bowlerDetailsForm" layout="row" layout-align="space-around start">
-          <md-input-container  flex-gt-sm>
-            <label> Bowler</label>
-            <md-select ng-model="bowler">
-              <md-option ng-repeat="bowler in (main.matchDetails.TeamOne.Bowling?main.matchDetails.TeamOne.Players:main.matchDetails.TeamTwo.Players)|filter:main.currentBowler"
-              value="{{bowler.PlayerName}}">
-                {{bowler.PlayerName}}
-              </md-option>
-            </md-select>
-          </md-input-container>
-
-          <md-button class="md-fab md-primary md-hue-2" aria-label="Profile" ng-disabled="!main.addBowlerButton"
-          ng-click="main.addBowler(bowler)">
-            <strong>+</strong>
-          </md-button>
-       </form>
-
-       <form name="batsmenForm" layout="row" class="md-block" layout-align="space-around start">
-          <md-input-container   flex-gt-sm>
-            <label>Batsmen</label>
-            <md-select ng-model="batsmen">
-              <md-option ng-repeat="Batsmen in (main.matchDetails.TeamOne.Batting?main.matchDetails.TeamOne.Players:main.matchDetails.TeamTwo.Players)"
-               value="{{Batsmen.PlayerName}}">
-                {{Batsmen.PlayerName}}
-              </md-option>
-            </md-select>
-          </md-input-container>
-           <md-input-container>
-        <md-checkbox name="strike" ng-model="main.striker">
-          Strike
-        </md-checkbox>
-        <!--<div ng-messages="projectForm.tos.$error" multiple md-auto-hide="false">
-          <div ng-message="required">
-            You must accept the terms of service before you can proceed.
-          </div>
-        </div>-->
-      </md-input-container>
-          <md-button class="md-fab md-primary md-hue-2" aria-label="Profile" ng-disabled="!main.addBatsmenButton"
-          ng-click="main.addBatsmen(batsmen,main.striker)">
-            <strong>+</strong>
-          </md-button>
-       </form>
-
         </md-card-content>
       </md-card>
+      <!--<md-card flex="50">-->
+        <!--<md-card-header layout-align="center">-->
+          <!--Match 1-->
+        <!--</md-card-header>-->
 
-      <md-card layout="column">
+        <!--<md-card-content layout="column">-->
+          <!--<form name="bowlerDetailsForm" layout="row" layout-align="space-around start">-->
+            <!--<md-input-container flex-gt-sm>-->
+              <!--<label> Bowler</label>-->
+              <!--<md-select ng-model="bowler">-->
+                <!--<md-option-->
+                  <!--ng-repeat="bowler in (main.matchDetails.TeamOne.Bowling?main.matchDetails.TeamOne.Players:main.matchDetails.TeamTwo.Players)|filter:main.currentBowler"-->
+                  <!--value="{{bowler.PlayerName}}">-->
+                  <!--{{bowler.PlayerName}}-->
+                <!--</md-option>-->
+              <!--</md-select>-->
+            <!--</md-input-container>-->
+
+            <!--<md-button class="md-fab md-primary md-hue-2" aria-label="Profile" ng-disabled="!main.addBowlerButton"-->
+                       <!--ng-click="main.addBowler(bowler)">-->
+              <!--<strong>+</strong>-->
+            <!--</md-button>-->
+          <!--</form>-->
+
+          <!--<form name="batsmenForm" layout="row" class="md-block" layout-align="space-around start">-->
+            <!--<md-input-container flex-gt-sm>-->
+              <!--<label>Batsmen</label>-->
+              <!--<md-select ng-model="batsmen">-->
+                <!--<md-option-->
+                  <!--ng-repeat="Batsmen in (main.matchDetails.TeamOne.Batting?main.matchDetails.TeamOne.Players:main.matchDetails.TeamTwo.Players)"-->
+                  <!--value="{{Batsmen.PlayerName}}">-->
+                  <!--{{Batsmen.PlayerName}}-->
+                <!--</md-option>-->
+              <!--</md-select>-->
+            <!--</md-input-container>-->
+            <!--<md-input-container>-->
+              <!--<md-checkbox name="strike" ng-model="main.striker">-->
+                <!--Strike-->
+              <!--</md-checkbox>-->
+              <!--&lt;!&ndash;<div ng-messages="projectForm.tos.$error" multiple md-auto-hide="false">-->
+                <!--<div ng-message="required">-->
+                  <!--You must accept the terms of service before you can proceed.-->
+                <!--</div>-->
+              <!--</div>&ndash;&gt;-->
+            <!--</md-input-container>-->
+            <!--<md-button class="md-fab md-primary md-hue-2" aria-label="Profile" ng-disabled="!main.addBatsmenButton"-->
+                       <!--ng-click="main.addBatsmen(batsmen,main.striker)">-->
+              <!--<strong>+</strong>-->
+            <!--</md-button>-->
+          <!--</form>-->
+
+        <!--</md-card-content>-->
+      <!--</md-card>-->
+
+      <md-card flex="50">
         <md-card-header layout-align="center">
           Match Details
         </md-card-header>
         <md-card-content layout="column" layout-align="center">
-         <div  layout="row" layout-align="space-around start">
-          <div ng-style="{'background-color':main.matchDetails.TeamOne.Batting?'rgb(255, 87, 34)':'rgba(0,0,0,0.12)'}"
-          layout="column"> {{main.matchDetails.TeamOne.Name}}
-          <br>
-          <span> {{main.matchDetails.TeamOne.TotalScore}}</span>
-         </div>
-         <div>Vs</div>
-          <div ng-style="{'background-color':main.matchDetails.TeamTwo.Batting?'rgb(255, 87, 34)':'rgba(0,0,0,0.12)'}"
-           layout="column"> {{main.matchDetails.TeamTwo.Name}}
-            <br>
-            <span> {{main.matchDetails.TeamTwo.TotalScore}}</span>
+          <div layout="row" layout-align="space-around start">
+            <div
+              ng-style="{'background-color':main.matchDetails.TeamOne.Batting==true?'rgb(255, 87, 34)':'rgba(0,0,0,0.12)'}"
+              layout="column"> {{main.matchDetails.TeamOne.Name}}
+              <br>
+              <span> {{main.matchDetails.TeamOne.TotalScore}}</span>
+            </div>
+            <div>Vs</div>
+            <div
+              ng-style="{'background-color':main.matchDetails.TeamTwo.Batting==true?'rgb(255, 87, 34)':'rgba(0,0,0,0.12)'}"
+              layout="column"> {{main.matchDetails.TeamTwo.Name}}
+              <br>
+              <span> {{main.matchDetails.TeamTwo.TotalScore}}</span>
+            </div>
           </div>
-         </div>
           <md-list flex layout="column">
             <md-subheader class="md-no-sticky">Batsmen</md-subheader>
             <md-list-item class="md-3-line" ng-repeat="batsmen in main.currentBatsmen.Player" ng-click="null"
-             ng-style="{'background-color':batsmen.active?'rgb(255, 87, 34)':'rgba(0,0,0,0.12)'}">
-              <div class="md-list-item-text" layout="column" >
-               <div layout="row"> <i class="material-icons" id="strike-icon" ng-hide="!main.currentBatsmen.Player.active">toc</i>
-                <h3>{{ batsmen.PlayerName }} : {{batsmen.active}}</h3> </div>
+                          ng-style="{'background-color':batsmen.active?'rgb(255, 87, 34)':'rgba(0,0,0,0.12)'}">
+              <div class="md-list-item-text" layout="column">
+                <div layout="row"><i class="material-icons" id="strike-icon"
+                                     ng-hide="!main.currentBatsmen.Player.active">toc</i>
+                  <h3>{{ batsmen.PlayerName }} : {{batsmen.active}}</h3></div>
                 <h4><span> R:{{batsmen.battingStats.Runs}} </span>
                   <span>B:{{batsmen.battingStats.Balls}}</span>
                   <span>SR:{{batsmen.battingStats.SR}}</span>
                   <span>6s:{{batsmen.battingStats['6s']}}</span>
                   <span>4s:{{batsmen.battingStats['4s']}}</span>
                   <span>3s:{{batsmen.battingStats['3s']}}</span>
-
                 </h4>
-                <span>{{batsmen.battingStats.RunsByBalls}}</span>
+                  <h4>{{batsmen.battingStats.RunsByBalls}}</h4>
               </div>
             </md-list-item>
           </md-list>
 
         </md-card-content>
       </md-card>
-      <md-card>
+    </div>
+    <div layout="row" layout-xs="column" flex>
+
+      <md-card flex="50">
         <section layout="row" layout-sm="column" layout-align="center center" layout-wrap>
-          <md-button ng-repeat="run in main.runsScored" ng-disabled="main.addBowlerButton || main.buttonDisable(run)"  ng-click="main.saveRuns(run)"
-                     class="md-raised md-fab md-primary">{{run}}</md-button>
-          <md-button class="md-raised md-fab" style="background-color: red;color: white;" >WK</md-button>
-            <md-button class="md-raised md-fab md-warn" ng-repeat="extra in main.extras"
-                       ng-click="main.setExtra(extra)">{{extra}}</md-button>
+          <md-button ng-repeat="run in main.runsScored" ng-disabled="main.addBowlerButton || main.buttonDisable(run)"
+                     ng-click="main.saveRuns(run)"
+                     class="md-raised md-fab md-primary">{{run}}
+          </md-button>
+          <md-button class="md-raised md-fab" style="background-color: red;color: white;"
+          ng-click="main.showWicketMenu($event)">WK</md-button>
+          <md-button class="md-raised md-fab md-warn" ng-repeat="extra in main.extras"
+                     ng-click="main.setExtra(extra)">{{extra}}
+          </md-button>
           <!--</section>-->
           <md-button class="md-raised md-fab md-warn" ng-click="main.undoScore()">
-          <i class="material-icons">undo</i> </md-button>
-          <div> </div>
+            <i class="material-icons">undo</i></md-button>
+          <div></div>
 
         </section>
 
       </md-card>
-      <md-card layout="column">
-        <div layout="column" layout-align="center center"> <h3> Total Score: {{main.totalScore}}
-        /0</h3>
-        <h5>Overs: {{main.totalOvers}}</h5> </div>
-         <md-card-content layout="column" layout-align="center start">
-        <md-list flex>
+      <md-card flex="50">
+        <div layout="column" layout-align="center center"><h3> Total Score: {{main.totalScore}}
+          /0</h3>
+          <h5>Overs: {{main.totalOvers}}</h5></div>
+        <md-card-content layout="column" layout-align="center start">
+          <md-list flex>
             <md-subheader class="md-no-sticky" layout="column">Bowler</md-subheader>
             <md-list-item class="md-3-line" ng-repeat="bowler in main.currentBowlers.Player" ng-click="null">
               <div class="md-list-item-text" layout="column">
@@ -188,23 +232,14 @@
                   <span>3s:{{bowler.bowlingstats['3s']}}</span>
                   <span>WD:{{bowler.bowlingstats['WD']}}</span>
                   <span>NB:{{bowler.bowlingstats['NB']}}</span>
-                <p>{{bowler.bowlingstats.Runs}}/{{bowler.bowlingstats.Wickets}}</p>
-                  </h4>
+                  <span>BYE:{{bowler.bowlingstats['BYE']}}</span>
+                  <p>{{bowler.bowlingstats.Runs}}/{{bowler.bowlingstats.Wickets}}</p>
+                </h4>
               </div>
             </md-list-item>
-            </md-list>
-         </md-card-content>
+          </md-list>
+        </md-card-content>
       </md-card>
-      <!--<md-card ng-repeat="awesomeThing in main.awesomeThings | orderBy:'rank'">-->
-        <!--<md-card-content>-->
-          <!--<img class="pull-right" ng-src="assets/images/{{ awesomeThing.logo }}" alt="{{ awesomeThing.title }}">-->
-          <!--<h3 class="md-title">{{ awesomeThing.title }}</h3>-->
-          <!--<p>{{ awesomeThing.description }}</p>-->
-        <!--</md-card-content>-->
-        <!--<div class="md-action-buttons">-->
-          <!--<md-button ng-href="{{ awesomeThing.url }}">Website</md-button>-->
-        <!--</div>-->
-      <!--</md-card>-->
     </div>
   </md-content>
 

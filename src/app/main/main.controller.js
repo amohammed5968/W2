@@ -8,7 +8,7 @@
 
   /** @ngInject */
   function MainController($scope, $timeout, teamServices, toastr, $log, locker, $mdDialog,
-                          matchServices, ScheduleService, Chronicle,DataService) {
+                          matchServices, ScheduleService, Chronicle, DataService, MatchScheduleService) {
     var main = this;
     main.matchInput = {
       'teamOne': '',
@@ -29,54 +29,89 @@
     main.ballsArray = [];
     main.currentBatsmen = {};
     main.currentBatsmen.Player = [];
-    main.strikerSet='';
+    main.strikerSet = '';
+    main.totalOvers = '';
+    main.totalScore = 0;
 
-    var team = { 'Name': '', 'BattingFirst': false, 'TotalScore': '0/0', 'Bowling': false, 'Batting': false };
-
-  //  function to disable extra buttons based on selection
-    main.buttonDisable = function (run)
-    {
-    //  return run==1?true:false;
-    return false;
+    var team = {
+      'Name': '', 'BattingFirst': false, 'TotalScore': '0/0', 'Bowling': false, 'Batting': false,
+      'Players': []
     };
 
-    main.clearSelection = function ()
-    {
-      null;
+    //  function to disable extra buttons based on selection
+    main.buttonDisable = function (run) {
+      //  return run==1?true:false;
+      return false;
     };
 
-  //  switching batsmen
-   matchServices.switchBatsmen(main.currentBatsmen);
+    main.clearSelection = function () {
+    };
+
+
+    //  switching batsmen
+    matchServices.switchBatsmen(main.currentBatsmen);
 
     //get MatchDetails
-    main.getMatchDetails = function(matchName) {
+    main.getMatchDetails = function (matchName) {
+      // DataService.getMatchDetails("MillikanVsAloha");
+      console.log(MatchScheduleService.match);
 
-      DataService.getMatchDetails("MillikanVsAloha");
-
-      main.matchDetails = matchServices.getMatchData("MillikanVsAloha").then(
-        function(success){
-
+      matchServices.getMatchData(MatchScheduleService.match.title).then(
+        function (success) {
+          //if success then populate the Match details
           main.matchDetails = success.data;
           if (main.matchDetails) {
             main.matchInputDone = true;
-            main.matchDetails.TeamOne = main.matchDetails.TeamOne[0];
-            main.matchDetails.TeamTwo = main.matchDetails.TeamTwo[0];
-            console.log(main.matchDetails);
-            console.log(main.matchDetails.TeamOne.Batting);
-            console.log(main.matchDetails.TeamTwo.Batting);
+            // main.matchDetails.TeamOne.Name = MatchScheduleService.match.hometeam;
+            // main.matchDetails.TeamTwo.Name = MatchScheduleService.match.awayteam;
+            main.matchInput.matchName = MatchScheduleService.match.title;
+            main.matchInput.teamOne = MatchScheduleService.match.hometeam;
+            main.matchInput.teamTwo = MatchScheduleService.match.awayteam;
+            // main.matchDetails.Overs = MatchScheduleService.match.Overs;
+            // main.matchDetails.TeamOne.Batting = true;
+            // main.matchDetails.TeamTwo.Batting =  false;
+
+            //get the player list of both the teams
+            teamServices.getTeam(main.matchDetails.TeamOne.Name).then(function (success) {
+              if (success.data != null)
+                main.matchDetails.TeamOne.Players = success.data.Players;
+            }, function (error) {
+              console.log('teams API error')
+            });
+
+            teamServices.getTeam(main.matchDetails.TeamTwo.Name).then(function (success) {
+              if (success.data != null)
+                main.matchDetails.TeamTwo.Players = success.data.Players;
+            }, function (error) {
+              console.log('teams API error')
+            });
           }
-          else main.matchDetails = {
-            'TeamOne': angular.copy(team), 'TeamTwo': angular.copy(team), 'Overs': 0
-          };
+          else if (main.matchDetails == null) {
+            console.log('Fill other details');
+            main.matchDetails = {
+              'TeamOne': angular.copy(team), 'TeamTwo': angular.copy(team), 'Overs': 0
+            };
+            // main.matchDetails.TeamOne.Name = MatchScheduleService.match.hometeam;
+            // main.matchDetails.TeamTwo.Name = MatchScheduleService.match.awayteam;
+            main.matchInput.matchName = MatchScheduleService.match.title;
+            main.matchInput.teamOne = MatchScheduleService.match.hometeam;
+            main.matchInput.teamTwo = MatchScheduleService.match.awayteam;
+          }
+          else
+            main.matchDetails = {
+              'TeamOne': angular.copy(team), 'TeamTwo': angular.copy(team), 'Overs': 0
+            };
+
+          initialChronicle ();
         }
-        ,function(error){
+        , function (error) {
           console.log(error);
         }
       );
 
     };
 
-    console.log(main.getMatchDetails());
+    main.getMatchDetails();
 // $scope.str = main.matchDetails;
 
 
@@ -102,6 +137,7 @@
       //   // main.currentBowlers.Player = [];
       // }
     // }
+    // }
     // else
 
 
@@ -114,36 +150,44 @@
       main.matchInput.teamTwo = main.matchDetails.TeamTwo.Name;
       main.matchInput.overs = main.matchDetails.Overs;
       // main.matchInput.firstBatting = main.matchDetails.TeamOne.BattingFirst?main.matchDetails.TeamOne.Name: main.matchDetails.TeamTwo.Name;
-      $log.info(main.matchDetails.TeamOne.BattingFirst ? main.matchDetails.TeamOne.Name : main.matchDetails.TeamTwo.Name);
     };
 
     main.saveMatchDetails = function (details) {
-      $log.info(details);
       main.matchDetails.matchName = details.matchName;
       main.matchDetails.TeamOne.Name = details.teamOne;
       main.matchDetails.TeamTwo.Name = details.teamTwo;
       main.matchDetails.Overs = details.overs;
       main.matchDetails.TeamTwo.BattingFirst = (main.matchDetails.TeamTwo.Name == details.firstBatting);
       main.matchDetails.TeamOne.BattingFirst = (main.matchDetails.TeamOne.Name == details.firstBatting);
-      main.matchDetails.TeamOne.Batting = (main.matchDetails.TeamOne.Name == details.firstBatting);
-      main.matchDetails.TeamTwo.Batting = (main.matchDetails.TeamTwo.Name == details.firstBatting);
-      main.matchDetails.TeamOne.Bowling = (main.matchDetails.TeamOne.Name != details.firstBatting);
-      main.matchDetails.TeamTwo.Bowling = (main.matchDetails.TeamTwo.Name != details.firstBatting);
 
+      if (main.matchDetails.TeamOne.Name == details.firstBatting) {
+        main.matchDetails.TeamOne.Batting = true;
+        main.matchDetails.TeamOne.Bowling = false;
+        main.matchDetails.TeamTwo.Batting = false;
+        main.matchDetails.TeamTwo.Bowling = true;
+      }
+      else {
+        main.matchDetails.TeamOne.Batting = false;
+        main.matchDetails.TeamOne.Bowling = true;
+        main.matchDetails.TeamTwo.Batting = true;
+        main.matchDetails.TeamTwo.Bowling = false;
+      }
+
+      console.log(main.matchDetails);
       matchServices.insertMatchData(JSON.stringify(main.matchDetails)).then(
-        function(success){
-         console.log(success);
+        function (success) {
+          console.log(success);
         }
-        ,function(error){
+        , function (error) {
           console.log(error);
         }
       );
 
 
-
       // localStorage.setItem('match', JSON.stringify(main.matchDetails));
       locker.put('match', main.matchDetails);
       main.matchInputDone = true;
+      initialChronicle ();
     };
 
     $log.info(JSON.stringify(main.matchDetails));
@@ -159,34 +203,36 @@
     main.addBatsmenButton = true;
 
     var idx;
-                /********************************/
-                  //  main.chronicle = Chronicle.record('totalOvers', main);
-                  //  console.log(main.chronicle);
-                  //Initializtion of variables
-                    main.canUndo = false;
-                    main.canRedo = false;
 
-                //Creation of chronicle object
-                main.numChronicle = Chronicle.record('matchDetails',main);
-                main.currentBatsmenChronicle = Chronicle.record('currentBatsmen',main);
-                main.currentBowlersChronicle = Chronicle.record('currentBowlers',main);
-                main.canUndoRedo = function(){
-                    main.canUndo = main.numChronicle.canUndo();
-                    main.canRedo = main.numChronicle.canRedo();
-                    main.canUndo = main.currentBatsmenChronicle.canUndo();
-                    main.canRedo = main.currentBatsmenChronicle.canRedo();
-                    main.canUndo = main.currentBowlersChronicle.canUndo();
-                    main.canRedo = main.currentBowlersChronicle.canRedo();
-                };
-                main.numChronicle.addOnAdjustFunction(main.canUndoRedo);
-                main.numChronicle.addOnUndoFunction(main.canUndoRedo);
-                main.numChronicle.addOnRedoFunction(main.canUndoRedo);
-                // main.numChronicle.addOnAdjustFunction(main.canUndoRedo);
-                // main.numChronicle.addOnUndoFunction(main.canUndoRedo);
-                // main.numChronicle.addOnRedoFunction(main.canUndoRedo);
+       function initialChronicle () {
+         /********************************/
+         //  main.chronicle = Chronicle.record('totalOvers', main);
+         //  console.log(main.chronicle);
+         //Initializtion of variables
+         main.canUndo = false;
+         main.canRedo = false;
 
-                  /************************************* */
+         //Creation of chronicle object
+         main.numChronicle = Chronicle.record('matchDetails', main);
+         main.currentBatsmenChronicle = Chronicle.record('currentBatsmen', main);
+         main.currentBowlersChronicle = Chronicle.record('currentBowlers', main);
+         main.canUndoRedo = function () {
+           main.canUndo = main.numChronicle.canUndo();
+           main.canRedo = main.numChronicle.canRedo();
+           main.canUndo = main.currentBatsmenChronicle.canUndo();
+           main.canRedo = main.currentBatsmenChronicle.canRedo();
+           main.canUndo = main.currentBowlersChronicle.canUndo();
+           main.canRedo = main.currentBowlersChronicle.canRedo();
+         };
+         main.numChronicle.addOnAdjustFunction(main.canUndoRedo);
+         main.numChronicle.addOnUndoFunction(main.canUndoRedo);
+         main.numChronicle.addOnRedoFunction(main.canUndoRedo);
+         // main.numChronicle.addOnAdjustFunction(main.canUndoRedo);
+         // main.numChronicle.addOnUndoFunction(main.canUndoRedo);
+         // main.numChronicle.addOnRedoFunction(main.canUndoRedo);
 
+         /************************************* */
+       }
     // function to set main.currentExtras
     main.setExtra = function (extra) {
 
@@ -203,7 +249,7 @@
     main.addBowler = function (playerName) {
       var bowlingStats = {
         'Overs': 0, 'Runs': 0, 'Wickets': 0, '4s': 0,
-        '6s': 0, '3s': 0, '2s': 0, '1s': 0, '0s': 0, 'WD':0, 'NB':0
+        '6s': 0, '3s': 0, '2s': 0, '1s': 0, '0s': 0, 'WD': 0, 'NB': 0, 'BYE':0
       };
       // var idx =main.currentBowlers.Player.map(function(val) {
       //   $log.info(val);
@@ -245,7 +291,9 @@
             main.addBowlerButton = true;
             // main.showPrompt();
           }
-          else { item.bowlingstats.Overs = Math.round((item.bowlingstats.Overs + (extras==1?0:0.1)) * 100) / 100; }
+          else {
+            item.bowlingstats.Overs = Math.round((item.bowlingstats.Overs + (extras == 1 ? 0 : 0.1)) * 100) / 100;
+          }
           // item.bowlingstats.Overs = +item.bowlingstats.Overs.toFixed(1) + +(0.1).toFixed(1);
           switch (runs) {
             case 4:
@@ -271,7 +319,22 @@
 
           }   //end of switch
 
-          item.bowlingstats.Runs = item.bowlingstats.Runs + +runs +extras;
+          switch(main.currentExtras){
+            case 'WD':
+                  $log.info(main.currentExtras);
+                  item.bowlingstats.WD +=1;
+                  break;
+            case 'NB':
+                  $log.info(main.currentExtras);
+                  item.bowlingstats.NB +=1;
+                  break;
+            case 'BYE'    :
+                  $log.info(main.currentExtras);
+                  item.bowlingstats.BYE +=1;
+                  break;
+          } //end of extras switch
+
+          item.bowlingstats.Runs = item.bowlingstats.Runs + +runs + extras;
         }
       }); //end of forEach
 
@@ -289,7 +352,7 @@
         if (item.active) {
           item.battingStats.Runs += runs;
 
-          item.battingStats.RunsByBalls = item.battingStats.RunsByBalls + ' ' + runs ;
+          item.battingStats.RunsByBalls = item.battingStats.RunsByBalls + ' ' + runs;
           //  if (checkOver())
           //  {
           //    changeStrike();
@@ -317,7 +380,10 @@
           item.active = true;
           $log.info('Striker ' + item.PlayerName);
         }
-        else { item.active = false; $log.info('Non-Striker ' + item.PlayerName); }
+        else {
+          item.active = false;
+          $log.info('Non-Striker ' + item.PlayerName);
+        }
       }); //end of forEach of changeStrike
     } //end of changeStrike
     //function to return true when the ballsArray has 6 deliveries without extras
@@ -326,13 +392,14 @@
       angular.forEach(main.ballsArray, function (item) {
         cnt += !item.extras ? 1 : 0;
       });
-      return (cnt==0?false: (cnt % 6 == 0));
+      return (cnt == 0 ? false : (cnt % 6 == 0));
     } //end of checkOver
 
     function saveRuns(runs) {
       var extra;
 
-    main.num++;
+      main.num++;
+
       if (main.currentExtras == 'WD' || main.currentExtras == 'NB') {
         extra = 1;
       }
@@ -345,8 +412,7 @@
       //adding to the total scrore
       main.totalScore = +runs + +extra + +main.totalScore;
 
-      main.ballsArray.push({ 'runs': runs, 'extras': extra });
-
+      main.ballsArray.push({'runs': runs, 'extras': extra});
 
 
       // update the bowlerstats of the bowler
@@ -371,20 +437,21 @@
       main.matchDetails.TeamOne.BattingFirst ? main.matchDetails.TeamOne.TotalScore = main.totalScore : main.matchDetails.TeamTwo.TotalScore = main.totalScore;
       main.currentExtras = null;
 
-  }
+    }
 
-   main.undoScore = function(){
-     console.log('undo');
-     console.log(main.matchDetails );
-        main.numChronicle.undo();
-        main.currentBatsmenChronicle.undo();
-        main.currentBowlersChronicle.undo();
-       console.log(main.matchDetails );
+    main.undoScore = function () {
+      console.log('undo');
+      console.log(main.matchDetails);
+      main.numChronicle.undo();
+      main.currentBatsmenChronicle.undo();
+      main.currentBowlersChronicle.undo();
+      console.log(main.matchDetails);
     };
 
     function setExtra(extra) {
       main.enableExtraRuns = true;
     }
+
     function selectedBowler(bowler) {
       $log.info(bowler);
 
@@ -394,7 +461,7 @@
     main.addBatsmen = function (playerName, striker) {
       var battingStats = {
         'Runs': 0, 'Balls': 0, 'SR': 0.00, '4s': 0,
-        '6s': 0, '3s': 0, '2s': 0, '1s': 0, '0s': 0, 'RunsByBalls':''
+        '6s': 0, '3s': 0, '2s': 0, '1s': 0, '0s': 0, 'RunsByBalls': ''
       };
 
       //  check if the batsmen is already add in the match object
@@ -415,8 +482,25 @@
 
     activate();
 
+    main.showWicketMenu = function(ev) {
+      $mdDialog.show({
+        controllerUrl: '/app/main/dialog.controller.js',
+        templateUrl: '/app/main/dialog.tmpl.html',
+        parent: angular.element(document.body),
+        targetEvent: ev,
+        clickOutsideToClose:true,
+        fullscreen: false// Only for -xs, -sm breakpoints.
+      })
+        .then(function(answer) {
+          main.status = 'You said the information was "' + answer + '".';
+        }, function() {
+          main.status = 'You cancelled the dialog.';
+        });
+    };
+
+
     function activate() {
-      getTeam();
+      //  getTeam();
       $timeout(function () {
         main.classAnimation = 'rubberBand';
       }, 4000);
@@ -429,18 +513,17 @@
 
     function getTeam() {
       if (typeof main.matchDetails.TeamOne !== 'undefined')
-      if (main.matchDetails.TeamOne.Batting)
-        main.matchDetails.TeamOne.Players = teamServices.getTeam(main.matchDetails.TeamOne.Name);
-      else
-        main.matchDetails.TeamTwo.Players = teamServices.getTeam(main.matchDetails.TeamTwo.Name);
+        if (main.matchDetails.TeamOne.Batting)
+          main.matchDetails.TeamOne.Players = teamServices.getTeam(main.matchDetails.TeamOne.Name);
+        else
+          main.matchDetails.TeamTwo.Players = teamServices.getTeam(main.matchDetails.TeamTwo.Name);
     }
   }
 
-function currentBowler()
-{
-  return function(input){
-    console.log(input);
-    return input;
-}
-}
+  function currentBowler() {
+    return function (input) {
+      console.log(input);
+      return input;
+    }
+  }
 })();

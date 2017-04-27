@@ -45,12 +45,13 @@
       <md-card-content style="height: 400px; overflow-y: auto">
       <md-list flex>
         <md-subheader class="md-no-sticky">List view</md-subheader>
-        <md-list-item class="md-3-line" ng-repeat="item in sch.schedulelist| orderBy : '-item.matchseq'" ng-click="null">
+        <md-list-item class="md-3-line" ng-repeat="item in sch.schedulelist| orderBy : '-item.matchseq'" ng-click="sch.selectSchedule(item)">
           <div class="md-list-item-text" layout="column">
+           <a ng-href="/#/">
             <h3>Match {{item.matchseq}} : {{ item.title }}</h3>
             <h4>{{item.date}} at {{item.venue}}</h4>
             <p>{{}}</p>
-
+           </a>
           </div>
         </md-list-item>
         </md-list>

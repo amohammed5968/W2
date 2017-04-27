@@ -11,7 +11,7 @@
     .factory('DataService', DataService);
 
   /** @ngInject */
-  function teamServices() {
+  function teamServices(RestAPIURLFactory, $http) {
     var data = [
       {
         'PlayerName': 'Ahsan Naveed Mohammed'
@@ -69,13 +69,8 @@
       }
     ];
 
-    this.getTeam = getTeam;
-
-    function getTeam(teamName) {
-      if (teamName=='Millikan')
-      return data;
-      else
-      return data2;
+    this.getTeam = function(id) {
+      return $http.get(RestAPIURLFactory.teams + '/' + id);
     }
   }
 

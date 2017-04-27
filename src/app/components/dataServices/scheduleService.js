@@ -3,7 +3,8 @@
 
   angular
     .module('w2')
-    .factory('ScheduleService', ScheduleService);
+    .factory('ScheduleService', ScheduleService)
+    .service('MatchScheduleService', MatchScheduleService);
 
 function ScheduleService(RestAPIURLFactory, $http)
 {
@@ -19,4 +20,9 @@ function ScheduleService(RestAPIURLFactory, $http)
 
     return scheduleService;
 }
+
+  function MatchScheduleService ()
+  {
+    // this.scheduleList = 'Match1';
+  }
 })();

@@ -10,7 +10,7 @@
 
   /** @ngInject */
   function ScheduleController($scope, $timeout, teamServices, toastr, $log, locker, $mdDialog,
-                          matchServices, ScheduleService, Chronicle, $mdToast, $filter) {
+                          matchServices, ScheduleService, Chronicle, $mdToast, $filter, MatchScheduleService) {
    var sch = this,
     last = {
       bottom: false,
@@ -23,7 +23,6 @@
     sch.getSchedule = function ()
     {
       ScheduleService.getSchedule().then(function(success){
-        console.log(success);
         sch.schedulelist = success.data.filter(function (el)
         {
           if (el.date.substr(0,4) == '2017')
@@ -31,11 +30,16 @@
         }) ;
       }, function(error)
       {
-        console.log(error);
+        $log.info('schedule API Error:' + error);
       })
     };
     sch.getSchedule ();
 
+
+      sch.selectSchedule = function (match)
+      {
+         MatchScheduleService.match = match;
+      };
 
 
   sch.saveSchedule = function(schedule)
@@ -48,17 +52,17 @@
         $scope.scheduleForm.$setPristine();
         sch.form = {};
         sch.getSchedule ();
-        console.log(success);
+        
         var pinTo = sch.getToastPosition();
 
         $mdToast.show(
           $mdToast.simple()
             .textContent('Sucessfully saved')
-            .position(pinTo )
+            .position(pinTo)
             .hideDelay(3000)
         );
       }, function (error){
-        console.log(error);
+        $log.info('schedule API Error:' + error);
       }
     )
   };

@@ -13,7 +13,8 @@
     return {
       matches: dbserviceurl +'/matches',
       users: dbserviceurl + '/users',
-      schedule: dbserviceurl + '/schedule'
+      schedule: dbserviceurl + '/schedule',
+      teams: dbserviceurl + '/teams'
     };
 
   }
