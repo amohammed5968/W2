@@ -64,7 +64,7 @@
                   </md-select>
                 </md-input-container>
 
-                <md-button class="md-fab md-primary md-hue-2" aria-label="Profile" ng-disabled="!main.addBowlerButton"
+                <md-button class="md-fab md-primary md-hue-2" aria-label="Profile" ng-disabled="!bowler"
                            ng-click="main.addBowler(bowler)">
                   <strong>+</strong>
                 </md-button>
@@ -86,7 +86,7 @@
                     Strike
                   </md-checkbox>
                 </md-input-container>
-                <md-button class="md-fab md-primary md-hue-2" aria-label="Profile" ng-disabled="!main.addBatsmenButton"
+                <md-button class="md-fab md-primary md-hue-2" aria-label="Profile" ng-disabled="!batsmen"
                            ng-click="main.addBatsmen(batsmen,main.striker)">
                   <strong>+</strong>
                 </md-button>
@@ -197,22 +197,23 @@
 
       <md-card flex="50">
         <section layout="row" layout-sm="column" layout-align="center center" layout-wrap>
-          <md-button ng-repeat="run in main.runsScored" ng-disabled="main.addBowlerButton || main.buttonDisable(run)"
+          <md-button ng-repeat="run in main.runsScored" ng-disabled="main.currentBatsmen.Player.length <2 || main.addBowlerButton
+          || main.currentBowlers.Player.length<0 || main.buttonDisable(run)"
                      ng-click="main.saveRuns(run)"
                      class="md-raised md-fab md-primary">{{run}}
           </md-button>
-          <md-button class="md-raised md-fab" style="background-color: red;color: white;"
+          <md-button class="md-raised md-fab" style="background-color: red;color: white;" ng-disabled="main.addBowlerButton"
           ng-click="main.showWicketMenu($event)">WK</md-button>
-          <md-button class="md-raised md-fab md-warn" ng-repeat="extra in main.extras"
+          <md-button class="md-raised md-fab md-warn" ng-repeat="extra in main.extras" ng-disabled="main.addBowlerButton"
                      ng-click="main.setExtra(extra)">{{extra}}
           </md-button>
-          <!--</section>-->
           <md-button class="md-raised md-fab md-warn" ng-click="main.undoScore()">
             <i class="material-icons">undo</i></md-button>
           <div></div>
-
         </section>
-
+        <section layout="row" layout-sm="column" layout-align="start center" layout-wrap>
+         {{main.ballsArray}}
+        </section>
       </md-card>
       <md-card flex="50">
         <div layout="column" layout-align="center center"><h3> Total Score: {{main.totalScore}}
@@ -224,16 +225,16 @@
             <md-list-item class="md-3-line" ng-repeat="bowler in main.currentBowlers.Player" ng-click="null">
               <div class="md-list-item-text" layout="column">
                 <h3>{{ bowler.PlayerName }}</h3>
-                <h4><span> O:{{bowler.bowlingstats.Overs}} </span>
-                  <span>R:{{bowler.bowlingstats.Runs}}</span>
-                  <span>W:{{bowler.bowlingstats.Wickets}}</span>
-                  <span>6s:{{bowler.bowlingstats['6s']}}</span>
-                  <span>4s:{{bowler.bowlingstats['4s']}}</span>
-                  <span>3s:{{bowler.bowlingstats['3s']}}</span>
-                  <span>WD:{{bowler.bowlingstats['WD']}}</span>
-                  <span>NB:{{bowler.bowlingstats['NB']}}</span>
-                  <span>BYE:{{bowler.bowlingstats['BYE']}}</span>
-                  <p>{{bowler.bowlingstats.Runs}}/{{bowler.bowlingstats.Wickets}}</p>
+                <h4><span> O:{{bowler.bowlingStats.Overs}} </span>
+                  <span>R:{{bowler.bowlingStats.Runs}}</span>
+                  <span>W:{{bowler.bowlingStats.Wickets}}</span>
+                  <span>6s:{{bowler.bowlingStats['6s']}}</span>
+                  <span>4s:{{bowler.bowlingStats['4s']}}</span>
+                  <span>3s:{{bowler.bowlingStats['3s']}}</span>
+                  <span>WD:{{bowler.bowlingStats['WD']}}</span>
+                  <span>NB:{{bowler.bowlingStats['NB']}}</span>
+                  <span>BYE:{{bowler.bowlingStats['BYE']}}</span>
+                  <p>{{bowler.bowlingStats.Runs}}/{{bowler.bowlingStats.Wickets}}</p>
                 </h4>
               </div>
             </md-list-item>
