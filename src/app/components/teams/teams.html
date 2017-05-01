@@ -1,0 +1,88 @@
+<md-content flex ng-cloak>
+  <header >
+    <acme-navbar></acme-navbar>
+  </header>
+  <div class="md-padding" layout-gt-xs="row" >
+    <md-card flex>
+      <div ng-cloak>
+        <md-content>
+          <md-toolbar>
+            <h2 class="md-toolbar-tools">
+              <span>Create Tournament</span>
+            </h2>
+          </md-toolbar>
+          <md-tabs md-dynamic-height md-border-bottom md-selected="selectedIndex">
+            <!--<md-tabs md-stretch-tabs-->
+            <!-->-->
+            <md-tab ng-repeat="tab in vm.tabs"
+                    ng-disabled="tab.disabled"
+                    label="{{tab.title}}" md-on-select="vm.changeTabs(tab)"></md-tab>
+          </md-tabs>
+          <md-content class="md-padding">
+
+            <div class="md-padding" layout-gt-xs="row">
+              <md-card flex>
+                <md-card-content>
+                  <form name="teamForm"  flex="70">
+                    <md-input-container layout="row">
+                      <label>Team Name</label>
+                      <input ng-model="vm.Team.Name">
+                    </md-input-container>
+                    <md-input-container flex-gt-sm layout="row"
+                                        ng-repeat="idx in vm.defaultPlayerList">
+                      <!--<label>Add Player{{idx}}</label>-->
+                      <input ng-model="idx.PlayerName" name="">
+                    </md-input-container>
+
+                    <div layout="column">
+                      <md-button class="md-raised  md-primary" ng-click="vm.addPlayer()">Add one more Player</md-button>
+                    </div>
+
+
+                    <div layout-gt-xs="row">
+                      <md-button class="md-raised md-primary" ng-disabled="teamForm.$invalid"
+                                 ng-click="vm.saveTeamDetails(vm.Team)">Save
+                      </md-button>
+
+                      </md-button>
+
+                    </div>
+                  </form>
+                </md-card-content>
+
+              </md-card>
+
+              <md-card flex>
+
+                <md-card-content style="height: 400px; overflow-y: auto">
+                  <md-list flex>
+                    <md-subheader class="md-no-sticky">Team Names (Total Teams: {{vm.teamList.length}})</md-subheader>
+                    <!--<div ng-show="vm.progressBar">-->
+                    <!--<md-progress-linear md-mode="indeterminate"></md-progress-linear>-->
+                    <!--Loading ...-->
+                    <!--</div>-->
+                    <md-list-item flex ng-init="elevation = 5" md-whiteframe="{{elevation}}"
+                                  class="md-2-line" ng-repeat="item in vm.teamList" ng-click="">
+                      <div style="padding-left: 10px;" layout="row" layout-align="space-between center" flex>
+
+                        <h4> {{item.Name}}</h4>
+
+                        <md-button class="md-fab md-mini" ng-click="vm.getTeam(item)">
+                          <md-tooltip md-direction="left">Click to edit Team Name and Player Details</md-tooltip>
+                          <md-icon><i class="material-icons">mode_edit</i></md-icon>
+                        </md-button>
+
+                      </div>
+                    </md-list-item>
+                  </md-list>
+                </md-card-content>
+              </md-card>
+            </div>
+
+          </md-content>
+          <!--</md-tabs>-->
+        </md-content>
+      </div>
+    </md-card>
+  </div>
+</md-content>

@@ -19,7 +19,20 @@
         templateUrl: 'app/components/schedule/schedule.html',
         controller: 'ScheduleController',
         controllerAs: 'sch'
+      })
+      .state('teams', {
+        url: '/teams',
+        templateUrl: 'app/components/teams/teams.html',
+        controller: 'TeamsController',
+        controllerAs: 'vm'
+      })
+      .state('team-tab', {
+        url: '/teams-tab',
+        templateUrl: 'app/components/teams/teams-tab.tmpl.html',
+        controller: 'TeamsController',
+        controllerAs: 'vm'
       });
+    
     $urlRouterProvider.otherwise('/');
   }
 

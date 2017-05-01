@@ -25,7 +25,7 @@
       var vm = this;
 
       // "vm.creationDate" is available by directive option "bindToController: true"
-      vm.relativeDate = moment(vm.creationDate).fromNow();
+      vm.relativeDate = moment(1490933525821).fromNow();
     }
   }
 

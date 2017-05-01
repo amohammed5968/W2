@@ -18,10 +18,10 @@
       left: false,
       right: true
     };
-
     //get schedule from backend
     sch.getSchedule = function ()
     {
+      sch.progressBar = true;
       ScheduleService.getSchedule().then(function(success){
         sch.schedulelist = success.data.filter(function (el)
         {
@@ -31,7 +31,8 @@
       }, function(error)
       {
         $log.info('schedule API Error:' + error);
-      })
+      });
+      sch.progressBar = false;
     };
     sch.getSchedule ();
 
@@ -52,7 +53,7 @@
         $scope.scheduleForm.$setPristine();
         sch.form = {};
         sch.getSchedule ();
-        
+
         var pinTo = sch.getToastPosition();
 
         $mdToast.show(

@@ -70,7 +70,18 @@
     ];
 
     this.getTeam = function(id) {
+      console.log('extract ' + id);
       return $http.get(RestAPIURLFactory.teams + '/' + id);
+    };
+    
+    this.getAllTeams = function()
+    {
+      return $http.get(RestAPIURLFactory.teams);
+    };
+
+    this.insertTeamData = function(team) {
+      console.log('extract ' + team);
+      return $http.post(RestAPIURLFactory.teams, JSON.stringify(team) );
     }
   }
 

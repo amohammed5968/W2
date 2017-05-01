@@ -3,8 +3,8 @@
 
   angular
     .module('w2')
-    .controller('MainController', MainController)
-    .filter('currentBowler', currentBowler);
+    .controller('MainController', MainController);
+    // .filter('currentBowler', currentBowler);
 
   /** @ngInject */
   function MainController($scope, $timeout, teamServices, toastr, $log, locker, $mdDialog,
@@ -33,6 +33,10 @@
     main.totalOvers = '';
     main.totalScore = 0;
     main.striker = true;
+    main.overCounter = 0;
+    // main.totalScore = 0;
+    // main.totalOvers = 0.0;
+    var teams = ['TeamOne','TeamTwo'];
 
     var team = {
       'Name': '', 'BattingFirst': false, 'TotalScore': '0/0', 'Bowling': false, 'Batting': false,
@@ -45,22 +49,21 @@
       return false;
     };
 
-    main.clearSelection = function () {
-    };
-
-
     //  switching batsmen
     matchServices.switchBatsmen(main.currentBatsmen);
 
     //get MatchDetails
-    main.getMatchDetails = function (matchName) {
+    main.getMatchDetails = function () {
       // DataService.getMatchDetails("MillikanVsAloha");
       console.log(MatchScheduleService.match);
 
+      //try to find the match details in db
       matchServices.getMatchData(MatchScheduleService.match.title).then(
         function (success) {
           //if success then populate the Match details
           main.matchDetails = success.data;
+          // console.log(success.data);
+          //if matchDetails are found then extract the data by calling MatchscheduleService
           if (main.matchDetails) {
             main.matchInputDone = true;
             // main.matchDetails.TeamOne.Name = MatchScheduleService.match.hometeam;
@@ -71,8 +74,56 @@
             // main.matchDetails.Overs = MatchScheduleService.match.Overs;
             // main.matchDetails.TeamOne.Batting = true;
             // main.matchDetails.TeamTwo.Batting =  false;
+            MatchScheduleService.matchDetails = main.matchDetails;
+            MatchScheduleService.getCurrentPlayerDetails();
+
 
             //get the player list of both the teams
+            if (main.matchDetails.TeamOne.Players.length == 0 || main.matchDetails.TeamOne.Players == null) {
+              teamServices.getTeam(main.matchDetails.TeamOne.Name).then(function (success) {
+                if (success.data != null)
+                  main.matchDetails.TeamOne.Players = success.data.Players;
+              }, function (error) {
+                console.log('teams API error')
+              });
+            }  //end of if
+
+              if(main.matchDetails.TeamTwo.Players.length==0||
+                main.matchDetails.TeamTwo.Players == null)
+              {
+                teamServices.getTeam(main.matchDetails.TeamTwo.Name).then(function(success)
+                {
+                  if (success.data != null)
+                    main.matchDetails.TeamTwo.Players = success.data.Players;
+                })
+              } //end of if
+
+              main.currentBatsmen.Player = MatchScheduleService.currentBatsmen;
+            main.currentBowlers.Player = MatchScheduleService.currentBowlers;
+              // main.totalScore = MatchScheduleService.totalScore;
+
+              main.matchDetails.TeamOne.Batting ?
+                ((main.totalScore = main.matchDetails.TeamOne.TotalScore) &&
+                (main.totalOvers = main.matchDetails.TeamOne.TotalOvers) &&
+                (main.overCounter = main.matchDetails.TeamOne.TotalOvers)) :
+                ((main.totalScore = main.matchDetails.TeamTwo.TotalScore) &&
+                (main.totalOvers = main.matchDetails.TeamTwo.TotalOvers) &&
+                (main.overCounter = main.matchDetails.TeamTwo.TotalOvers));
+
+              console.log(MatchScheduleService);
+
+
+          }
+          else if (main.matchDetails == null) {
+            console.log('Fill other details');
+            main.matchDetails = {
+              'TeamOne': angular.copy(team), 'TeamTwo': angular.copy(team), 'Overs': 0
+            };
+            main.matchDetails.TeamOne.Name = MatchScheduleService.match.hometeam;
+            main.matchDetails.TeamTwo.Name = MatchScheduleService.match.awayteam;
+            main.matchInput.matchName = MatchScheduleService.match.title;
+            main.matchInput.teamOne = MatchScheduleService.match.hometeam;
+            main.matchInput.teamTwo = MatchScheduleService.match.awayteam;
             teamServices.getTeam(main.matchDetails.TeamOne.Name).then(function (success) {
               if (success.data != null)
                 main.matchDetails.TeamOne.Players = success.data.Players;
@@ -86,17 +137,7 @@
             }, function (error) {
               console.log('teams API error')
             });
-          }
-          else if (main.matchDetails == null) {
-            console.log('Fill other details');
-            main.matchDetails = {
-              'TeamOne': angular.copy(team), 'TeamTwo': angular.copy(team), 'Overs': 0
-            };
-            // main.matchDetails.TeamOne.Name = MatchScheduleService.match.hometeam;
-            // main.matchDetails.TeamTwo.Name = MatchScheduleService.match.awayteam;
-            main.matchInput.matchName = MatchScheduleService.match.title;
-            main.matchInput.teamOne = MatchScheduleService.match.hometeam;
-            main.matchInput.teamTwo = MatchScheduleService.match.awayteam;
+
           }
           else
             main.matchDetails = {
@@ -149,10 +190,12 @@
       main.matchInput.teamOne = main.matchDetails.TeamOne.Name;
       main.matchInput.teamTwo = main.matchDetails.TeamTwo.Name;
       main.matchInput.overs = main.matchDetails.Overs;
-      // main.matchInput.firstBatting = main.matchDetails.TeamOne.BattingFirst?main.matchDetails.TeamOne.Name: main.matchDetails.TeamTwo.Name;
+
+      getTeam();
     };
 
     main.saveMatchDetails = function (details) {
+
       main.matchDetails.matchName = details.matchName;
       main.matchDetails.TeamOne.Name = details.teamOne;
       main.matchDetails.TeamTwo.Name = details.teamTwo;
@@ -173,7 +216,7 @@
         main.matchDetails.TeamTwo.Bowling = false;
       }
 
-      console.log(main.matchDetails);
+      // console.log(main.matchDetails);
       matchServices.insertMatchData(JSON.stringify(main.matchDetails)).then(
         function (success) {
           console.log(success);
@@ -195,10 +238,9 @@
     // initializing variables
     main.runsScored = [0, 1, 2, 3, 4, 5, 6];
     main.extras = ['WD', 'NB', 'BYE', 'L-BYE'];
-    main.totalScore = 0;
-    main.totalOvers = 0.0;
+
     main.balls = 0;
-    main.overCounter = 0;
+
     main.addBowlerButton = true;
     main.addBatsmenButton = true;
 
@@ -256,16 +298,13 @@
       //   $log.info(val);
       //   return val.PlayerName;
       // }).indexOf(playerName);
-      $log.info(checkExists(main.currentBowlers.Player, playerName));
+      // $log.info(checkExists(main.currentBowlers.Player, playerName));
 
-      // $log.info(main.currentBowlers);
-
-      // main.currentBowlers.Player.push({'Name':playerName});
-      // main.currentBowlers.Player.push({'bowlingstats':bowlingStats});
+       //check if the bowler exists in the currentlist, if so just addOver
       ((idx = checkExists(main.currentBowlers.Player, playerName)) == -1) ?
         main.currentBowlers.Player.push({
           'PlayerName': playerName,
-          'active': true,
+          'Active': true,
           'bowlingStats': bowlingStats
         }) : addOvers(main.currentBowlers.Player[idx]);
       // main.currentBowlers.PlayerName.push({'bowlingstats':bowlingStats});
@@ -277,7 +316,7 @@
 
     function addOvers(bowler) {
       // bowler.bowlingstats.Overs = +1;
-      bowler.active = true;
+      bowler.Active = true;
       $log.info(bowler);
     }
 
@@ -285,15 +324,15 @@
     function updateCurrentBowlerRuns(runs, extras) {
       angular.forEach(main.currentBowlers.Player, function (item) {
         $log.info(item);
-        if (item.active) {
-          if (checkOver() && extras ==0) {
-            item.bowlingStats.Overs = Math.round((item.bowlingStats.Overs + 0.5) * 100) / 100;
-            item.active = false;
+        if (item.Active) {
+          if (checkOver() && extras == 0) {
+            item.bowlingStats.Overs = Math.round((+item.bowlingStats.Overs + 0.5) * 100) / 100;
+            item.Active = false;
             main.addBowlerButton = true;
             // main.showPrompt();
           }
           else {
-            item.bowlingStats.Overs = Math.round((item.bowlingStats.Overs + (extras == 1 ? 0 : 0.1)) * 100) / 100;
+            item.bowlingStats.Overs = Math.round((+item.bowlingStats.Overs + (extras == 1 ? 0 : 0.1)) * 100) / 100;
           }
           switch (runs) {
             case 4:
@@ -343,13 +382,13 @@
     } //end of updateCurrentBowlerRuns
 
     function updateCurrentBatsmenStats(runs, extras) {
-      var overComplete = (extras==0)?checkOver():false;
+      var overComplete = (extras == 0) ? checkOver() : false;
       //  loop through the main.currentBatsmen object and update the batting stats for the player on strike
       angular.forEach(main.currentBatsmen.Player, function (item) {
         $log.info('Inside currentBatsmen');
         $log.info(item);
         //  add the runs to the batsmen on strike
-        if (item.active) {
+        if (item.Strike) {
           item.battingStats.Runs += runs;
 
           item.battingStats.RunsByBalls = item.battingStats.RunsByBalls + ' ' + runs;
@@ -376,12 +415,12 @@
     function changeStrike() {
       angular.forEach(main.currentBatsmen.Player, function (item) {
         $log.info(item);
-        if (!item.active) {
-          item.active = true;
+        if (!item.Strike) {
+          item.Strike = true;
           $log.info('Striker ' + item.PlayerName);
         }
         else {
-          item.active = false;
+          item.Strike = false;
           $log.info('Non-Striker ' + item.PlayerName);
         }
       }); //end of forEach of changeStrike
@@ -421,31 +460,55 @@
       // update the battingstats of the batsmen object
       updateCurrentBatsmenStats(runs, extra);
 
-      // check if the over is complete
-      if (checkOver() && extra==0) {
+  //    update team score and extras
+      /***********************/
+      teams.forEach(function (team){
+      if(main.matchDetails[team].Batting)
+      {
+        main.matchDetails[team].TotalScore = main.totalScore;
+      }
+      });
+      /***********************/
+
+
+  // check if the over is complete
+      if (checkOver() && extra == 0) {
         $log.info('its over');
-        main.overCounter = main.overCounter + 1;
+        main.overCounter = +main.overCounter + 1;
         main.balls = 0;
+        // update the teams totalscore, overs in match details
+        // main.matchDetails.TeamOne.BattingFirst ?
+        //   ((main.matchDetails.TeamOne.TotalScore = main.totalScore) && (main.matchDetails.TeamOne.Overs = main.overCounter))
+        //   : ((main.matchDetails.TeamTwo.TotalScore = main.totalScore) && (main.matchDetails.TeamTwo.Overs = main.overCounter));
+        main.currentExtras = null;
 
         // save/update it to database
         var idx = ['TeamOne', 'TeamTwo'];
-
+        //loop through to add bowlingStats and battingStats to the players
         idx.forEach(function (idxval) {
           console.log(idxval);
+
           angular.forEach(main.matchDetails[idxval].Players, function (item, key) {
             // console.log(item);
             if (main.matchDetails[idxval].Batting) {
-              item.battingStats = {};
+              main.matchDetails[idxval].TotalOvers = main.overCounter;
+              main.matchDetails[idxval].TotalScore = main.totalScore;
+              //item.battingStats = {};
               main.currentBatsmen.Player.filter(function (el, index, arr) {
-                if (el.PlayerName === item.PlayerName)
+                if (el.PlayerName === item.PlayerName) {
                   main.matchDetails[idxval].Players[key].battingStats = el.battingStats;
+                  main.matchDetails[idxval].Players[key].Strike = el.Strike;
+                  main.matchDetails[idxval].Players[key].Out = el.Out;
+                }
               }); //end of filter loop
             }  //end of batting if
             else {
-              item.bowlingStats = {};
+             // item.bowlingStats = {};
               main.currentBowlers.Player.filter(function (el) {
-                if (el.PlayerName === item.PlayerName)
+                if (el.PlayerName === item.PlayerName) {
                   main.matchDetails[idxval].Players[key].bowlingStats = el.bowlingStats;
+                  main.matchDetails[idxval].Players[key].Active = el.Active;
+                } //end of if
               });  //end of filter
             }
           });
@@ -459,7 +522,7 @@
           , function (error) {
             console.log(error);
           }
-        );
+        );  //end of insertMatchData
 
       }
       else {
@@ -467,11 +530,7 @@
       } //end of if-else for checkover
       main.totalOvers = +main.overCounter + +('0.' + main.balls);
 
-      // update the teams totalscore in match details
-      main.matchDetails.TeamOne.BattingFirst ? main.matchDetails.TeamOne.TotalScore = main.totalScore : main.matchDetails.TeamTwo.TotalScore = main.totalScore;
-      main.currentExtras = null;
-
-    }
+    } //end of saveRuns function
 
     main.undoScore = function () {
       console.log('undo');
@@ -479,7 +538,7 @@
       main.numChronicle.undo();
       main.currentBatsmenChronicle.undo();
       main.currentBowlersChronicle.undo();
-      console.log(main.matchDetails);
+      // console.log(main.matchDetails);
     };
 
     function setExtra(extra) {
@@ -510,7 +569,9 @@
       ((idx = checkExists(main.currentBatsmen.Player, playerName)) == -1) ?
         main.currentBatsmen.Player.push({
           'PlayerName': playerName,
-          'active': !!main.striker,    // :-)
+          'Strike': !!main.striker,    // :-)
+          'Out': false,
+          'WicketTakenBy': '',
           'battingStats': battingStats
         }) : null;
       $log.info(main.currentBatsmen);
@@ -524,6 +585,8 @@
     main.showWicketMenu = function (ev) {
       $mdDialog.show({
         controllerUrl: '/app/main/dialog.controller.js',
+        controller: 'DialogController',
+        controllerAs: 'vm',
         templateUrl: '/app/main/dialog.tmpl.html',
         parent: angular.element(document.body),
         targetEvent: ev,
@@ -531,7 +594,21 @@
         fullscreen: false// Only for -xs, -sm breakpoints.
       })
         .then(function (answer) {
-          main.status = 'You said the information was "' + answer + '".';
+             console.log('Then update the bowler stats and batsmen stats');
+          console.log(MatchScheduleService.currentBatsmen);
+          console.log(MatchScheduleService.WKDetails);
+
+          console.log(main.currentBatsmen);
+
+        //  update the score by calling saveRuns
+        //   saveRuns(MatchScheduleService.WKDetails.runsScored);
+
+          //  save to the db
+          saveMatchDetailsToDB (teams);
+
+          //remove the batsmen from strike
+
+
         }, function () {
           main.status = 'You cancelled the dialog.';
         });
@@ -546,23 +623,65 @@
     }
 
     function showToastr() {
-      toastr.info('Fork <a href="https://github.com/Swiip/generator-gulp-angular" target="_blank"><b>generator-gulp-angular</b></a>');
+      // toastr.info('Fork <a href="https://github.com/Swiip/generator-gulp-angular" target="_blank"><b>generator-gulp-angular</b></a>');
+      toastr.info('Click here');
       main.classAnimation = '';
     }
 
     function getTeam() {
-      if (typeof main.matchDetails.TeamOne !== 'undefined')
-        if (main.matchDetails.TeamOne.Batting)
-          main.matchDetails.TeamOne.Players = teamServices.getTeam(main.matchDetails.TeamOne.Name);
-        else
-          main.matchDetails.TeamTwo.Players = teamServices.getTeam(main.matchDetails.TeamTwo.Name);
-    }
-  }
+      var idx = ['TeamOne', 'TeamTwo'];
+      idx.forEach(function (item) {
+        console.log(item);
+        if (typeof main.matchDetails[item] !== 'undefined')
+          if (main.matchDetails[item].Batting)
+            main.matchDetails[item].Players = teamServices.getTeam(main.matchDetails[item].Name);
+          else
+            main.matchDetails[item].Players = teamServices.getTeam(main.matchDetails[item].Name);
+      });
+    } // end of getTeam
 
-  function currentBowler() {
-    return function (input) {
-      console.log(input);
-      return input;
+    // save/update it to database
+
+    function saveMatchDetailsToDB (teams)
+    {
+      //loop through to add bowlingStats and battingStats to the players
+      teams.forEach(function (team) {
+        console.log(team);
+
+        angular.forEach(main.matchDetails[team].Players, function (item, key) {
+          // console.log(item);
+          if (main.matchDetails[team].Batting) {
+            main.matchDetails[team].TotalOvers = main.overCounter;
+            main.matchDetails[team].TotalScore = main.totalScore;
+            main.currentBatsmen.Player.filter(function (el, index, arr) {
+              if (el.PlayerName === item.PlayerName) {
+                main.matchDetails[team].Players[key].battingStats = el.battingStats;
+                main.matchDetails[team].Players[key].Strike = el.Strike;
+                main.matchDetails[team].Players[key].Out = el.Out;
+              }
+            }); //end of filter loop
+          }  //end of batting if
+          else {
+            // item.bowlingStats = {};
+            main.currentBowlers.Player.filter(function (el) {
+              if (el.PlayerName === item.PlayerName) {
+                main.matchDetails[team].Players[key].bowlingStats = el.bowlingStats;
+                main.matchDetails[team].Players[key].Active = el.Active;
+              } //end of if
+            });  //end of filter
+          }
+        });
+      });
+
+      console.log(JSON.stringify(main.matchDetails));
+      // matchServices.insertMatchData(JSON.stringify(main.matchDetails)).then(
+      //   function (success) {
+      //     console.log(success);
+      //   }
+      //   , function (error) {
+      //     console.log(error);
+      //   }
+      // );  //end of insertMatchData
     }
   }
 })();

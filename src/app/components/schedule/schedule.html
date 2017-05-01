@@ -1,38 +1,38 @@
-    <md-content>
+    <md-content ng-cloak>
     <header>
       <acme-navbar></acme-navbar>
     </header>
-  <div  class="md-padding" layout-sm="column" layout="row">
-    <md-card flex-auto>
+  <div  class="md-padding" layout-gt-xs="row"  flex>
+    <md-card flex>
     <md-card-header>
     <h1>Schedule</h1>
       </md-card-header>
-    <md-card-content style="height: 400px; overflow-y: auto">
+    <md-card-content flex>
     <form name="scheduleForm">
-      <md-input-container  layout="row">
+      <md-input-container  layout="row" layout-xs="column" >
         <label>Match Sequence</label>
         <input ng-model="sch.form.matchseq" required>
       </md-input-container>
-      <md-input-container  layout="row">
+      <md-input-container  layout="row" layout-xs="column" >
         <label>Home Team</label>
         <input ng-model="sch.form.hometeam"  required>
       </md-input-container>
-      <md-input-container  layout="row">
+      <md-input-container  layout="row" layout-xs="column" >
         <label>Away Team</label>
         <input ng-model="sch.form.awayteam"  required>
       </md-input-container>
-      <md-input-container  layout="row">
+      <md-input-container  layout="row" layout-xs="column" >
         <label>Venue</label>
         <input ng-model="sch.form.venue"  required>
       </md-input-container>
-      <md-input-container  layout="row">
+      <md-input-container  layout="row" layout-xs="column" >
         <label>Overs</label>
         <input ng-model="sch.form.overs"  required>
       </md-input-container>
 
         <md-datepicker ng-model="sch.form.displaydate"  required></md-datepicker>
 
-      <div layout="row">
+      <div layout="row" layout-xs="column" >
         <md-button class="md-raised md-primary" ng-disabled="scheduleForm.$invalid" ng-click="sch.saveSchedule(sch.form)">Done</md-button>
 
       </md-button>
@@ -40,11 +40,15 @@
     </form>
     </md-card-content>
       </md-card >
-    <md-card flex-auto>
+    <md-card flex>
 
-      <md-card-content style="height: 400px; overflow-y: auto">
-      <md-list flex>
+      <md-card-content style="height: 400px; overflow-y: auto" flex>
+      <md-list>
         <md-subheader class="md-no-sticky">List view</md-subheader>
+          <div ng-show="sch.progressBar">
+          <md-progress-linear md-mode="indeterminate"></md-progress-linear>
+            Loading ...
+          </div>
         <md-list-item class="md-3-line" ng-repeat="item in sch.schedulelist| orderBy : '-item.matchseq'" ng-click="sch.selectSchedule(item)">
           <div class="md-list-item-text" layout="column">
            <a ng-href="/#/home">

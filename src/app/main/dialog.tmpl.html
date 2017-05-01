@@ -1,45 +1,54 @@
-<md-dialog>
-  <form ng-cloak>
+<md-dialog flex="60">
+  <form ng-cloak name="WKform">
     <md-toolbar>
       <div class="md-toolbar-tools">
         <h2>Fill in the details</h2>
         <span flex></span>
-        <md-button class="md-icon-button" ng-click="dialog.cancel()">
+        <md-button class="md-icon-button" ng-click="vm.cancel()">
         </md-button>
       </div>
     </md-toolbar>
 
     <md-dialog-content>
-      <div class="md-dialog-content">
-        <md-input-container class="md-block" flex-gt-sm>
-          <label>Was there a run scored?</label>
-          <input md-maxlength="30" required name="name" ng-model="user.name" />
-        </md-input-container>
-        <md-input-container class="md-block" flex-gt-sm>
-          <label>who got out?</label>
-          <input md-maxlength="30" required name="name" ng-model="user.name" />
+      <div class="md-dialog-content" layout="column">
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>who got out?</label>
+            <md-select ng-model="vm.batsmen">
+              <md-option
+                ng-repeat="batsmen in vm.currentBatsmenList"
+                value="{{batsmen.PlayerName}}">
+                {{batsmen.PlayerName}}
+              </md-option>
+            </md-select>
           </md-input-container>
-        <md-input-container class="md-block" flex-gt-sm>
-          <label>How did he get out?</label>
-          <input md-maxlength="30" required name="name" ng-model="user.name" />
-        </md-input-container>
-        <md-input-container class="md-block" flex-gt-sm>
-          <label>Who took the wicket?</label>
-          <input md-maxlength="30" required name="name" ng-model="user.name" />
-        </md-input-container>
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>How did he get out?</label>
+            <md-select ng-model="vm.outBy">
+              <md-option
+                ng-repeat="outBy in ['Bowled','Caught', 'Stumped','Run Out','Hit Wicket']"
+                value="{{outBy}}">
+                {{outBy}}
+              </md-option>
+            </md-select>
+          </md-input-container>
+          <md-input-container ng-show="vm.outBy" class="md-block" flex-gt-sm>
+            <label>{{outBy}} by?</label>
+            <input required name="bowler" ng-model="vm.bowler" />
+          </md-input-container>
+          <md-input-container class="md-block"  ng-show="vm.outBy" flex-gt-sm>
+            <label>Was there a run scored? (Not Extra)</label>
+            <input required name="runScored" ng-model="vm.runScored"/>
+          </md-input-container>
       </div>
     </md-dialog-content>
 
     <md-dialog-actions layout="row">
-      <md-button href="http://en.wikipedia.org/wiki/Mango" target="_blank" md-autofocus>
-        More on Wikipedia
-      </md-button>
       <span flex></span>
-      <md-button ng-click="answer('not useful')">
-        Not Useful
+      <md-button ng-disabled="WKform.$invalid" ng-click="vm.updateScore()">
+        Submit
       </md-button>
       <md-button ng-click="answer('useful')">
-        Useful
+        Cancel
       </md-button>
     </md-dialog-actions>
   </form>

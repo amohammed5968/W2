@@ -28,7 +28,7 @@
             <md-input-container layout="row">
               <label>First Batting</label>
               <md-select ng-model="main.matchInput.firstBatting">
-                <md-option ng-repeat="batting in [main.matchInput.teamOne, main.matchInput.teamTwo]"
+                <md-option ng-repeat="batting in [main.matchInput.teamOne, main.matchInput.teamTwo]" ng-show="main.matchInput.teamOne && main.matchInput.teamTwo"
                            value="{{batting}}">
                   {{batting}}
                 </md-option>
@@ -173,7 +173,7 @@
           <md-list flex layout="column">
             <md-subheader class="md-no-sticky">Batsmen</md-subheader>
             <md-list-item class="md-3-line" ng-repeat="batsmen in main.currentBatsmen.Player" ng-click="null"
-                          ng-style="{'background-color':batsmen.active?'rgb(255, 87, 34)':'rgba(0,0,0,0.12)'}">
+                          ng-style="{'background-color':batsmen.Strike?'rgb(255, 87, 34)':'rgba(0,0,0,0.12)'}">
               <div class="md-list-item-text" layout="column">
                 <div layout="row"><i class="material-icons" id="strike-icon"
                                      ng-hide="!main.currentBatsmen.Player.active">toc</i>
@@ -187,6 +187,29 @@
                 </h4>
                   <h4>{{batsmen.battingStats.RunsByBalls}}</h4>
               </div>
+              <md-menu class="md-secondary">
+                <md-button class="md-icon-button" ng-click="$mdOpenMenu($event)">
+                  <i class="material-icons">more</i></md-button>
+                </md-button>
+                <md-menu-content width="4">
+                  <md-menu-item>
+                    <md-button>
+                      Remove
+                    </md-button>
+                  </md-menu-item>
+                  <md-menu-item>
+                    <md-button ng-click="main.showWicketMenu($event)">
+                      Out
+                    </md-button>
+                  </md-menu-item>
+                  <md-menu-divider></md-menu-divider>
+                  <md-menu-item>
+                    <md-button>
+                      Notifications
+                    </md-button>
+                  </md-menu-item>
+                </md-menu-content>
+              </md-menu>
             </md-list-item>
           </md-list>
 
@@ -202,7 +225,7 @@
                      ng-click="main.saveRuns(run)"
                      class="md-raised md-fab md-primary">{{run}}
           </md-button>
-          <md-button class="md-raised md-fab" style="background-color: red;color: white;" ng-disabled="main.addBowlerButton"
+          <md-button class="md-raised md-fab" style="background-color: red;color: white;"
           ng-click="main.showWicketMenu($event)">WK</md-button>
           <md-button class="md-raised md-fab md-warn" ng-repeat="extra in main.extras" ng-disabled="main.addBowlerButton"
                      ng-click="main.setExtra(extra)">{{extra}}
