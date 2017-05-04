@@ -8,7 +8,7 @@
     .config(Config);
 
   function restAPIURL() {
-    var dbserviceurl = 'http://cricnotes.com:8080';
+    var dbserviceurl = 'http://localhost:8080';
 
     return {
       matches: dbserviceurl + '/matches',

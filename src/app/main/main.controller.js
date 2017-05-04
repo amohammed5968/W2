@@ -39,7 +39,7 @@
     var teams = ['TeamOne','TeamTwo'];
 
     var team = {
-      'Name': '', 'BattingFirst': false, 'TotalScore': '0/0', 'Bowling': false, 'Batting': false,
+      'Name': '', 'BattingFirst': false, 'TotalScore': '0', 'Bowling': false, 'Batting': false,
       'Players': []
     };
 
@@ -105,9 +105,11 @@
               main.matchDetails.TeamOne.Batting ?
                 ((main.totalScore = main.matchDetails.TeamOne.TotalScore) &&
                 (main.totalOvers = main.matchDetails.TeamOne.TotalOvers) &&
+                (main.ballsArray=  main.matchDetails.TeamOne.BallByBall) &&
                 (main.overCounter = main.matchDetails.TeamOne.TotalOvers)) :
                 ((main.totalScore = main.matchDetails.TeamTwo.TotalScore) &&
                 (main.totalOvers = main.matchDetails.TeamTwo.TotalOvers) &&
+                (main.ballsArray=  main.matchDetails.TeamTwo.BallByBall) &&
                 (main.overCounter = main.matchDetails.TeamTwo.TotalOvers));
 
               console.log(MatchScheduleService);
@@ -451,7 +453,8 @@
       //adding to the total scrore
       main.totalScore = +runs + +extra + +main.totalScore;
 
-      main.ballsArray.push({'runs': runs, 'extras': extra});
+      main.ballsArray.push({'ball':((main.overCounter*6) + main.balls),
+        'runs': runs, 'extras': main.currentExtras, 'extraruns':extra});
 
 
       // update the bowlerstats of the bowler
@@ -493,6 +496,8 @@
             if (main.matchDetails[idxval].Batting) {
               main.matchDetails[idxval].TotalOvers = main.overCounter;
               main.matchDetails[idxval].TotalScore = main.totalScore;
+              main.matchDetails[idxval].BallByBall = main.ballsArray;
+
               //item.battingStats = {};
               main.currentBatsmen.Player.filter(function (el, index, arr) {
                 if (el.PlayerName === item.PlayerName) {
@@ -529,7 +534,7 @@
         main.totalOvers = '0.' + main.balls;
       } //end of if-else for checkover
       main.totalOvers = +main.overCounter + +('0.' + main.balls);
-
+      main.currentExtras = null;
     } //end of saveRuns function
 
     main.undoScore = function () {
